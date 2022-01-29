@@ -29,9 +29,12 @@ class DGGBot(DGGChat):
 
         return decorator
 
-    def mention(self, func):
+    def mention(self):
         """Decorator to add auto-replies to bot."""
-        self._mention[func.__name__] = func
+        def decorator(func):
+            self._mention[func.__name__] = func
+            return func
+        return decorator
 
     def on_mention(self, msg):
         for func in self._mention.values():

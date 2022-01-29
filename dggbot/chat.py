@@ -18,7 +18,7 @@ class DGGChat:
         self._connected = False
 
     def is_mentioned(self, msg: Union[Message, PrivateMessage]) -> bool:
-        return False if self.username is None else (self.username.lower() in msg.data)
+        return False if self.username is None else (self.username.lower() in msg.data.lower())
 
     def on_mention(self, msg):
         """Do stuff when mentioned."""
