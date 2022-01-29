@@ -1,0 +1,2 @@
+class Throttled(Exception):
+    pass
