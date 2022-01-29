@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name="dgg-bot-fritz",
+    name="dgg-bot",
     version="0.1.0",
     author="Fritz",
     description="A library for making a bot in Destiny.gg chat.",
@@ -16,7 +16,6 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "src"},
     packages=find_packages(),
     python_requires=">=3.7",
 )
