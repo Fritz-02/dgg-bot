@@ -54,7 +54,7 @@ class DGGChat:
             if self.is_mentioned(msg):
                 self.on_mention(msg)
         elif event_type == EventType.PRIVMSG:
-            msg = PrivateMessage(event_type, data['nick'], data['features'], data['timestamp'], data['data'], data['messageid'])
+            msg = PrivateMessage(event_type, data['nick'], data['timestamp'], data['data'], data['messageid'])
             logging.debug(msg)
             self.on_privmsg(msg)
             if self.is_mentioned(msg):
@@ -100,5 +100,11 @@ class DGGChat:
         self.ws.run_forever(origin=self.URL)
 
     def send(self, msg: str):
+        """Send a message to chat."""
         payload = {'data': msg}
         self.ws.send(f'MSG {json.dumps(payload)}')
+
+    def send_privmsg(self, nick: str, msg: str):
+        """Send private message to someone."""
+        payload = {"nick": nick, "data": msg}
+        self.ws.send(f'PRIVMSG {json.dumps(payload)}')
