@@ -13,12 +13,12 @@ class DGGChat:
     URL = "https://www.destiny.gg"
 
     def __init__(self, auth_token=None, *, username: str = None):
-        self.username = username
+        self.username = username.lower()
         self.ws = websocket.WebSocketApp(self.WSS, cookie=f'authtoken={auth_token}' if auth_token else None, on_open=self._on_open, on_message=self._on_message, on_error=self._on_error, on_close=self._on_close)
         self._connected = False
 
     def is_mentioned(self, msg: Union[Message, PrivateMessage]) -> bool:
-        return False if self.username is None else (self.username.lower() in msg.data.lower())
+        return False if self.username is None else (self.username in msg.data.lower())
 
     def on_mention(self, msg):
         """Do stuff when mentioned."""
@@ -54,7 +54,7 @@ class DGGChat:
             if self.is_mentioned(msg):
                 self.on_mention(msg)
         elif event_type == EventType.PRIVMSG:
-            msg = PrivateMessage(event_type, data['nick'], data['timestamp'], data['data'], data['messageid'])
+            msg = PrivateMessage(event_type, data['nick'], data['features'], data['timestamp'], data['data'], data['messageid'])
             logging.debug(msg)
             self.on_privmsg(msg)
             if self.is_mentioned(msg):
