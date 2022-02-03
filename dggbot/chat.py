@@ -4,8 +4,8 @@ from typing import Union
 import websocket
 
 from .event import EventType
-from .message import Message, PrivateMessage
-from .errors import Throttled
+from .message import Message, PrivateMessage, MuteMessage
+from .errors import Banned, Throttled
 
 
 class DGGChat:
@@ -36,11 +36,27 @@ class DGGChat:
         """Do stuff when chatter joins."""
         pass
 
-    def on_msg(self, msg):
+    def on_ban(self, msg: Message):
+        """Do stuff when a chatter is banned."""
+        pass
+
+    def on_unban(self, msg: Message):
+        """Do stuff when a chatter is unbanned."""
+        pass
+
+    def on_mute(self, msg: MuteMessage):
+        """Do stuff when a chatter is muted."""
+        pass
+
+    def on_refresh(self, msg: Message):
+        """Do stuff when refreshed."""
+        pass
+
+    def on_msg(self, msg: Message):
         """Do stuff when a MSG is received."""
         pass
 
-    def on_privmsg(self, msg):
+    def on_privmsg(self, msg: PrivateMessage):
         """Do stuff when a PRIVMSG is received."""
         pass
 
@@ -48,37 +64,45 @@ class DGGChat:
         event_type, data = message.split(maxsplit=1)
         data = json.loads(data)
         if event_type == EventType.MESSAGE:
-            msg = Message(event_type, data['nick'], data['features'], data['timestamp'], data['data'])
-            logging.debug(msg)
+            msg = Message(self, event_type, data['nick'], data['features'], data['timestamp'], data['data'])
             self.on_msg(msg)
             if self.is_mentioned(msg):
                 self.on_mention(msg)
         elif event_type == EventType.PRIVMSG:
-            msg = PrivateMessage(event_type, data['nick'], data['timestamp'], data['data'], data['messageid'])
-            logging.debug(msg)
+            msg = PrivateMessage(self, event_type, data['nick'], timestamp=data['timestamp'], data=data['data'], message_id=data['messageid'])
             self.on_privmsg(msg)
             if self.is_mentioned(msg):
                 self.on_mention(msg)
         elif event_type == EventType.BROADCAST:
-            msg = Message(event_type, timestamp=data['timestamp'], data=data['data'])
-            logging.debug(msg)
+            msg = Message(self, event_type, timestamp=data['timestamp'], data=data['data'])
             self.on_broadcast(msg)
         elif event_type == EventType.NAMES:
-            logging.debug(event_type, data)
+            logging.debug(f"{event_type} {data}")
         elif event_type in (EventType.JOIN, EventType.QUIT):
-            msg = Message(event_type, data['nick'], data['features'], data['timestamp'])
-            logging.debug(msg)
+            msg = Message(self, event_type, data['nick'], data['features'], data['timestamp'])
             if event_type == EventType.JOIN:
                 self.on_join(msg)
             else:
                 self.on_quit(msg)
+        elif event_type == EventType.BAN:
+            msg = Message(self, event_type, data['nick'], data['features'], data['timestamp'], data['data'])
+            self.on_ban(msg)
+        elif event_type == EventType.UNBAN:
+            msg = Message(self, event_type, data['nick'], data['features'], data['timestamp'], data['data'])
+            self.on_unban(msg)
         elif event_type == EventType.MUTE:
-            msg = Message(event_type, data['nick'], timestamp=data['timestamp'],
-                          data=f"{data['data']} muted by {data['nick']} for {data.get('duration', 'N/A')}.")
-            logging.debug(msg)
+            msg = MuteMessage(self, event_type, data['nick'], data['features'], data['timestamp'], data['data'], data['duration'])
+            self.on_mute(msg)
+        elif event_type == EventType.REFRESH:
+            msg = Message(self, event_type, data['nick'], data['features'], data['timestamp'])
+            self.on_refresh(msg)
+        elif event_type in (EventType.PRIVMSGSENT, EventType.REFRESH):
+            pass
         elif event_type == EventType.ERROR:
             if data['description'] == 'throttled':
                 raise Throttled
+            elif data['description'] == "banned":
+                raise Banned
             else:
                 logging.error(event_type, data)
                 raise Exception(data['description'])
