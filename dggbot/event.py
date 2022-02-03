@@ -2,6 +2,7 @@ class EventType:
     MESSAGE = 'MSG'
     MUTE = 'MUTE'
     PRIVMSG = 'PRIVMSG'
+    PRIVMSGSENT = 'PRIVMSGSENT'
     JOIN = 'JOIN'
     QUIT = 'QUIT'
     REFRESH = 'REFRESH'
