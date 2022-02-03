@@ -12,7 +12,7 @@ setup(
         "Bug Tracker": "https://github.com/Fritz-02/dgg-bot/issues",
     },
     classifiers=[
-        "Development Status :: 4 - Beta"
+        "Development Status :: 4 - Beta",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.7",
