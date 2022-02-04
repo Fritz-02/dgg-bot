@@ -43,7 +43,15 @@ A simple bot with two commands and will yump back at chatters. **Take care not t
    @bot.command(aliases=["banmeplease"])  # aliases for this command
    def banme(msg):  # $banme / $banmeplease
       bot.send("RightToBearArmsLOL BINGQILIN nathanTiny2")
-
+      
+   def is_cake(msg):  # a check where only the user Cake can use commands with this check
+      return msg.nick == "Cake"
+   
+   @bot.command(aliases=["oooo"])
+   @bot.check(is_cake)
+   def pog(msg):
+      msg.reply("Cake OOOO")
+   
    @bot.mention()
    def yump(msg):
       if "MiyanoHype" in msg.data:
