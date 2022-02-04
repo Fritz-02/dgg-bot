@@ -30,15 +30,22 @@ class DGGBot(DGGChat):
 
         return decorator
 
-    def is_owner(self):
-        """Decorator to add 'owner' permission required to a command."""
+    def check(self, check_func: Callable):
+        """
+        Decorator to restrict command-usage by using a check function.
+        :param check_func: a function that checks for some statement and returns a bool.
+        :return:
+        """
         def decorator(func: Callable):
             if not hasattr(func, "_perms"):
                 func._perms = []
-            perm = "owner"
-            func._perms.append(perm)
+            func._perms.append(check_func)
             return func
         return decorator
+
+    def is_owner(self):
+        """Decorator to make command only usable by the bot owner."""
+        return self.check(lambda msg: msg.nick.lower() == self._owner)
 
     def mention(self):
         """Decorator to add auto-replies to bot."""
@@ -68,6 +75,6 @@ class DGGBot(DGGChat):
         if cmd in self._commands:
             if hasattr(self._commands[cmd], "_perms"):
                 perms = self._commands[cmd]._perms
-                if "owner" in perms and msg.nick.lower() != self._owner:
+                if any(not perm(msg) for perm in perms):
                     return
             self._commands[cmd](msg)
