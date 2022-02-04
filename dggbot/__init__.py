@@ -1,3 +1,4 @@
 from .bot import DGGBot
 from .chat import DGGChat
-from .message import Message, PrivateMessage
+from .event import EventType
+from .message import Message, PrivateMessage, MuteMessage
