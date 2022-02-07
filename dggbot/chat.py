@@ -106,7 +106,7 @@ class DGGChat:
                 self, event_type, data["nick"], data["features"], data["timestamp"]
             )
             self.on_refresh(msg)
-        elif event_type in (EventType.PRIVMSGSENT, EventType.REFRESH):
+        elif event_type == EventType.PRIVMSGSENT:
             pass
         elif event_type == EventType.ERROR:
             if data["description"] == "throttled":
