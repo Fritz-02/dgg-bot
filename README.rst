@@ -33,7 +33,7 @@ A simple bot with two commands and will yump back at chatters. **Take care not t
    from dggbot import DGGBot
    import time
 
-   bot = DGGBot('AUTH_TOKEN', username='Username', owner='Owner', prefix="$")  # default command prefix is "!"
+   bot = DGGBot("AUTH_TOKEN", username="Username", owner="Owner", prefix="$")  # default command prefix is "!"
 
    @bot.command()
    @bot.is_owner()  # only the owner named above can use this command.
@@ -51,7 +51,19 @@ A simple bot with two commands and will yump back at chatters. **Take care not t
    @bot.check(is_cake)
    def pog(msg):
       msg.reply("Cake OOOO")
-   
+
+   """
+   Events
+   You can either name the function after the event, or include the event name in the decorator.
+   mention() is also included as a shortcut for event("on_mention").
+
+   Event names: on_ban, on_broadcast, on_join, on_mention, on_msg, on_mute, on_privmsg, on_quit, on_refresh, on_unban
+   """
+   @bot.event()
+   def on_msg(msg):
+      print(msg)
+
+   # @bot.event("on_mention")
    @bot.mention()
    def yump(msg):
       if "MiyanoHype" in msg.data:
