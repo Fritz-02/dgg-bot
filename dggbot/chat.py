@@ -12,8 +12,8 @@ class DGGChat:
     WSS = "wss://chat.destiny.gg/ws"
     URL = "https://www.destiny.gg"
 
-    def __init__(self, auth_token=None, *, username: str = None):
-        self.username = username.lower()
+    def __init__(self, auth_token=None, username: str = None):
+        self.username = username.lower() if isinstance(username, str) else None
         self.ws = websocket.WebSocketApp(
             self.WSS,
             cookie=f"authtoken={auth_token}" if auth_token else None,
@@ -26,7 +26,11 @@ class DGGChat:
         self._events = {}
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(username='{self.username}', connected={self._connected})"
+        return (
+            f"{self.__class__.__name__}(username='{self.username}')"
+            if self.username
+            else f"{self.__class__.__name__}()"
+        )
 
     def _on_message(self, ws, message: str):
         event_type, data = message.split(maxsplit=1)
@@ -120,7 +124,11 @@ class DGGChat:
             logging.warning(f"Unknown event type: {event_type} {data}")
 
     def _on_open(self, ws):
-        logging.debug(f"Connecting as {self.username} to {self.WSS}.")
+        logging.debug(
+            f"Connecting "
+            + (f"as {self.username} " if self.username else "")
+            + f"to {self.WSS}."
+        )
         self._connected = True
 
     def _on_close(self, ws, *_):
