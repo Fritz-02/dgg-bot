@@ -7,7 +7,7 @@ from .chat import DGGChat
 class DGGBot(DGGChat):
     def __init__(
         self,
-        auth_token: str = None,
+        auth_token: str,
         username: str = None,
         owner: str = None,
         prefix="!",
