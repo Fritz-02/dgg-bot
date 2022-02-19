@@ -11,3 +11,4 @@ class EventType:
     ERROR = "ERR"
     BAN = "BAN"
     UNBAN = "UNBAN"
+    UNMUTE = "UNMUTE"
