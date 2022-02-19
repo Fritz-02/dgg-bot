@@ -105,6 +105,9 @@ class DGGChat:
                 data["duration"],
             )
             self.on_mute(msg)
+        elif event_type == EventType.UNMUTE:
+            msg = Message(self, event_type, data["nick"], data["features"], data["timestamp"], data["data"])
+            self.on_unmute(msg)
         elif event_type == EventType.REFRESH:
             msg = Message(
                 self, event_type, data["nick"], data["features"], data["timestamp"]
@@ -180,7 +183,6 @@ class DGGChat:
     def send(self, msg: str):
         """Send a message to chat."""
         payload = {"data": msg}
-        self.ws.send(f"MSG {json.dumps(payload)}")
 
     def send_privmsg(self, nick: str, msg: str):
         """Send private message to someone."""
@@ -215,6 +217,11 @@ class DGGChat:
     def on_mute(self, msg: MuteMessage):
         """Do stuff when a chatter is muted."""
         for func in self._events.get("on_mute", tuple()):
+            func(msg)
+
+    def on_unmute(self, msg: Message):
+        """Do stuff when a chatter is unmuted."""
+        for func in self._events.get("on_unmute", tuple()):
             func(msg)
 
     def on_refresh(self, msg: Message):
