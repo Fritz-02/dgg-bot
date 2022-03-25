@@ -11,20 +11,24 @@ class DGGBot(DGGChat):
         username: str = None,
         owner: str = None,
         prefix="!",
+        wss: str = None
     ):
-        super().__init__(auth_token=auth_token, username=username)
-        self._owner = owner.lower()
+        super().__init__(auth_token=auth_token, username=username, wss=wss)
+        self._owner = owner.lower() if owner else None
         self.prefix = prefix
         self._commands = {}
 
-    def command(self, aliases: Union[List[str], Tuple[str]] = tuple(), *args, **kwargs):
+    def command(self, aliases: Union[List[str], Tuple[str]] = tuple(),
+                *args, whisper_only: bool = False,  **kwargs):
         """
         Decorator to add commands to bot.
         :param aliases: aliases to call the function besides the function name
+        :param whisper_only: Command will only run when through whispers/private messages.
         :return:
         """
-
         def decorator(func: Callable):
+            if whisper_only:
+                func = self.check(lambda msg: isinstance(msg, PrivateMessage))(func)
             for cmd_name in itertools.chain((func.__name__,), aliases):
                 if cmd_name in self._commands:
                     raise Exception(f'Command name "{cmd_name}" already exists.')
@@ -52,7 +56,6 @@ class DGGBot(DGGChat):
         :param check_funcs: functions that check for some statement and returns a bool.
         :return:
         """
-
         def decorator(func: Callable):
             if not hasattr(func, "_perms"):
                 func._perms = []
