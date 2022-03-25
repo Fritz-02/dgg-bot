@@ -5,17 +5,17 @@ import websocket
 
 from .event import EventType
 from .message import Message, PrivateMessage, MuteMessage
-from .errors import Banned, Throttled
+from .errors import AccountTooYoung, Banned, DuplicateMessage, InvalidMessage, NeedLogin, NoPermission, NotFound, ProtocolError, SubMode, Throttled, TooManyConnections
 
 
 class DGGChat:
     WSS = "wss://chat.destiny.gg/ws"
     URL = "https://www.destiny.gg"
 
-    def __init__(self, auth_token=None, username: str = None):
+    def __init__(self, auth_token=None, username: str = None, wss: str = None):
         self.username = username.lower() if isinstance(username, str) else None
         self.ws = websocket.WebSocketApp(
-            self.WSS,
+            wss or self.WSS,
             cookie=f"authtoken={auth_token}" if auth_token else None,
             on_open=self._on_open,
             on_message=self._on_message,
@@ -116,13 +116,24 @@ class DGGChat:
         elif event_type == EventType.PRIVMSGSENT:
             pass
         elif event_type == EventType.ERROR:
-            if data["description"] == "throttled":
-                raise Throttled
-            elif data["description"] == "banned":
-                raise Banned
+            err_dict = {
+                "banned": Banned,
+                "duplicate": DuplicateMessage,
+                "invalidmsg": InvalidMessage,
+                "needlogin": NeedLogin,
+                "nopermission": NoPermission,
+                "notfound": NotFound,
+                "privmsgaccounttooyoung": AccountTooYoung,
+                "protocolerror": ProtocolError,
+                "submode": SubMode,
+                "throttled": Throttled,
+                "toomanyconnections": TooManyConnections
+            }
+            if (desc := data["description"]) in err_dict:
+                raise err_dict[desc]
             else:
                 logging.error(event_type, data)
-                raise Exception(data["description"])
+                raise Exception(desc)
         else:
             logging.warning(f"Unknown event type: {event_type} {data}")
 
@@ -177,12 +188,13 @@ class DGGChat:
         for func in self._events.get("on_privmsg", tuple()):
             func(msg)
 
-    def run(self):
-        self.ws.run_forever(origin=self.URL)
+    def run(self, origin: str = None):
+        self.ws.run_forever(origin=origin or self.URL)
 
     def send(self, msg: str):
         """Send a message to chat."""
         payload = {"data": msg}
+        self.ws.send(f"MSG {json.dumps(payload)}")
 
     def send_privmsg(self, nick: str, msg: str):
         """Send private message to someone."""
