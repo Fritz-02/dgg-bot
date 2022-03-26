@@ -5,7 +5,20 @@ import websocket
 
 from .event import EventType
 from .message import Message, PrivateMessage, MuteMessage
-from .errors import AccountTooYoung, Banned, DuplicateMessage, InvalidMessage, NeedLogin, NoPermission, NotFound, ProtocolError, SubMode, Throttled, TooManyConnections
+from .user import User
+from .errors import (
+    AccountTooYoung,
+    Banned,
+    DuplicateMessage,
+    InvalidMessage,
+    NeedLogin,
+    NoPermission,
+    NotFound,
+    ProtocolError,
+    SubMode,
+    Throttled,
+    TooManyConnections,
+)
 
 
 class DGGChat:
@@ -24,6 +37,7 @@ class DGGChat:
         )
         self._connected = False
         self._events = {}
+        self._users = {}
 
     def __repr__(self):
         return (
@@ -31,6 +45,10 @@ class DGGChat:
             if self.username
             else f"{self.__class__.__name__}()"
         )
+
+    @property
+    def users(self) -> dict:
+        return self._users.copy()
 
     def _on_message(self, ws, message: str):
         event_type, data = message.split(maxsplit=1)
@@ -66,6 +84,7 @@ class DGGChat:
             self.on_broadcast(msg)
         elif event_type == EventType.NAMES:
             logging.debug(f"{event_type} {data}")
+            self.on_names(data["connectioncount"], data["users"])
         elif event_type in (EventType.JOIN, EventType.QUIT):
             msg = Message(
                 self, event_type, data["nick"], data["features"], data["timestamp"]
@@ -106,7 +125,14 @@ class DGGChat:
             )
             self.on_mute(msg)
         elif event_type == EventType.UNMUTE:
-            msg = Message(self, event_type, data["nick"], data["features"], data["timestamp"], data["data"])
+            msg = Message(
+                self,
+                event_type,
+                data["nick"],
+                data["features"],
+                data["timestamp"],
+                data["data"],
+            )
             self.on_unmute(msg)
         elif event_type == EventType.REFRESH:
             msg = Message(
@@ -127,7 +153,7 @@ class DGGChat:
                 "protocolerror": ProtocolError,
                 "submode": SubMode,
                 "throttled": Throttled,
-                "toomanyconnections": TooManyConnections
+                "toomanyconnections": TooManyConnections,
             }
             if (desc := data["description"]) in err_dict:
                 raise err_dict[desc]
@@ -150,7 +176,7 @@ class DGGChat:
         self._connected = False
 
     def _on_error(self, ws, error):
-        logging.error(error)
+        logging.error(error, exc_info=True)
 
     def event(self, event_name: str = None):
         """Decorator to run function when the specified event occurs."""
@@ -183,6 +209,14 @@ class DGGChat:
         for func in self._events.get("on_msg", tuple()):
             func(msg)
 
+    def on_names(self, connectioncount: int, users: list):
+        """Do stuff when the NAMES message is received upon connecting to chat."""
+        self._users = {
+            user["nick"].lower(): User(user["nick"], user["features"]) for user in users
+        }
+        for func in self._events.get("on_names", tuple()):
+            func(connectioncount, users)
+
     def on_privmsg(self, msg: PrivateMessage):
         """Do stuff when a PRIVMSG is received."""
         for func in self._events.get("on_privmsg", tuple()):
@@ -208,11 +242,13 @@ class DGGChat:
 
     def on_join(self, msg):
         """Do stuff when chatter joins."""
+        self._users[msg.nick.lower()] = User(msg.nick, msg.features)
         for func in self._events.get("on_join", tuple()):
             func(msg)
 
     def on_quit(self, msg):
         """Do stuff when chatter joins."""
+        del self._users[msg.nick.lower()]
         for func in self._events.get("on_quit", tuple()):
             func(msg)
 
