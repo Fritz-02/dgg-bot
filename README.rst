@@ -32,7 +32,7 @@ Not sure what to put here at this point in time. Unauthorized chat bots are subj
 Examples
 --------
 
-A simple bot with two commands and will yump back at chatters. **Take care not to create a bot that will be a nuisance in chat, or you risk getting IP banned.**
+A simple bot with two commands and will yump back at chatters.
 
 .. code-block:: python
 
