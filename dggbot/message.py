@@ -1,5 +1,5 @@
 import dataclasses
-import logging
+from ._logging import _logger
 
 
 @dataclasses.dataclass
@@ -11,8 +11,12 @@ class Message:
     timestamp: int = None
     data: str = None
 
+    @property
+    def nick_lower(self) -> str:
+        return self.nick.lower()
+
     def __post_init__(self):
-        logging.debug(self)
+        _logger.debug(self)
 
     def reply(self, content):
         self.chat.send(content)
