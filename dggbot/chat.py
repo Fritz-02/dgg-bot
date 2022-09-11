@@ -1,9 +1,9 @@
 import json
-import logging
 from typing import Callable, Union
 import websocket
 
 from .event import EventType
+from ._logging import _logger
 from .message import Message, PrivateMessage, MuteMessage
 from .user import User
 from .errors import (
@@ -65,54 +65,6 @@ class DGGChat:
             self.on_msg(msg)
             if self.is_mentioned(msg):
                 self.on_mention(msg)
-        elif event_type == EventType.PRIVMSG:
-            msg = PrivateMessage(
-                self,
-                event_type,
-                data["nick"],
-                timestamp=data["timestamp"],
-                data=data["data"],
-                message_id=data["messageid"],
-            )
-            self.on_privmsg(msg)
-            if self.is_mentioned(msg):
-                self.on_mention(msg)
-        elif event_type == EventType.BROADCAST:
-            msg = Message(
-                self, event_type, timestamp=data["timestamp"], data=data["data"]
-            )
-            self.on_broadcast(msg)
-        elif event_type == EventType.NAMES:
-            logging.debug(f"{event_type} {data}")
-            self.on_names(data["connectioncount"], data["users"])
-        elif event_type in (EventType.JOIN, EventType.QUIT):
-            msg = Message(
-                self, event_type, data["nick"], data["features"], data["timestamp"]
-            )
-            if event_type == EventType.JOIN:
-                self.on_join(msg)
-            else:
-                self.on_quit(msg)
-        elif event_type == EventType.BAN:
-            msg = Message(
-                self,
-                event_type,
-                data["nick"],
-                data["features"],
-                data["timestamp"],
-                data["data"],
-            )
-            self.on_ban(msg)
-        elif event_type == EventType.UNBAN:
-            msg = Message(
-                self,
-                event_type,
-                data["nick"],
-                data["features"],
-                data["timestamp"],
-                data["data"],
-            )
-            self.on_unban(msg)
         elif event_type == EventType.MUTE:
             msg = MuteMessage(
                 self,
@@ -134,11 +86,53 @@ class DGGChat:
                 data["data"],
             )
             self.on_unmute(msg)
-        elif event_type == EventType.REFRESH:
+        elif event_type == EventType.BAN:
             msg = Message(
-                self, event_type, data["nick"], data["features"], data["timestamp"]
+                self,
+                event_type,
+                data["nick"],
+                data["features"],
+                data["timestamp"],
+                data["data"],
             )
-            self.on_refresh(msg)
+            self.on_ban(msg)
+        elif event_type == EventType.UNBAN:
+            msg = Message(
+                self,
+                event_type,
+                data["nick"],
+                data["features"],
+                data["timestamp"],
+                data["data"],
+            )
+            self.on_unban(msg)
+        elif event_type == EventType.SUBONLY:
+            msg = Message(
+                self,
+                event_type,
+                data["nick"],
+                data["features"],
+                data["timestamp"],
+                data["data"],
+            )
+            self.on_subonly(msg)
+        elif event_type == EventType.BROADCAST:
+            msg = Message(
+                self, event_type, timestamp=data["timestamp"], data=data["data"]
+            )
+            self.on_broadcast(msg)
+        elif event_type == EventType.PRIVMSG:
+            msg = PrivateMessage(
+                self,
+                event_type,
+                data["nick"],
+                timestamp=data["timestamp"],
+                data=data["data"],
+                message_id=data["messageid"],
+            )
+            self.on_privmsg(msg)
+            if self.is_mentioned(msg):
+                self.on_mention(msg)
         elif event_type == EventType.PRIVMSGSENT:
             pass
         elif event_type == EventType.ERROR:
@@ -158,13 +152,31 @@ class DGGChat:
             if (desc := data["description"]) in err_dict:
                 raise err_dict[desc]
             else:
-                logging.error(event_type, data)
+                _logger.error(event_type, data)
                 raise Exception(desc)
+        elif event_type == EventType.NAMES:
+            _logger.debug(f"{event_type} {data}")
+            self.on_names(data["connectioncount"], data["users"])
+        elif event_type == EventType.JOIN:
+            msg = Message(
+                self, event_type, data["nick"], data["features"], data["timestamp"]
+            )
+            self.on_join(msg)
+        elif event_type == EventType.QUIT:
+            msg = Message(
+                self, event_type, data["nick"], data["features"], data["timestamp"]
+            )
+            self.on_quit(msg)
+        elif event_type == EventType.REFRESH:
+            msg = Message(
+                self, event_type, data["nick"], data["features"], data["timestamp"]
+            )
+            self.on_refresh(msg)
         else:
-            logging.warning(f"Unknown event type: {event_type} {data}")
+            _logger.warning(f"Unknown event type: {event_type} {data}")
 
     def _on_open(self, ws):
-        logging.debug(
+        _logger.debug(
             f"Connecting "
             + (f"as {self.username} " if self.username else "")
             + f"to {self.WSS}."
@@ -172,11 +184,11 @@ class DGGChat:
         self._connected = True
 
     def _on_close(self, ws, *_):
-        logging.debug(f"Connection closed.")
+        _logger.debug(f"Connection closed.")
         self._connected = False
 
     def _on_error(self, ws, error):
-        logging.error(error, exc_info=True)
+        _logger.error(error)
 
     def event(self, event_name: str = None):
         """Decorator to run function when the specified event occurs."""
@@ -209,13 +221,13 @@ class DGGChat:
         for func in self._events.get("on_msg", tuple()):
             func(msg)
 
-    def on_names(self, connectioncount: int, users: list):
+    def on_names(self, connection_count: int, users: list):
         """Do stuff when the NAMES message is received upon connecting to chat."""
         self._users = {
             user["nick"].lower(): User(user["nick"], user["features"]) for user in users
         }
         for func in self._events.get("on_names", tuple()):
-            func(connectioncount, users)
+            func(connection_count, users)
 
     def on_privmsg(self, msg: PrivateMessage):
         """Do stuff when a PRIVMSG is received."""
@@ -242,13 +254,13 @@ class DGGChat:
 
     def on_join(self, msg):
         """Do stuff when chatter joins."""
-        self._users[msg.nick.lower()] = User(msg.nick, msg.features)
+        self._users[msg.nick_lower] = User(msg.nick, msg.features)
         for func in self._events.get("on_join", tuple()):
             func(msg)
 
     def on_quit(self, msg):
         """Do stuff when chatter joins."""
-        del self._users[msg.nick.lower()]
+        self._users.pop(msg.nick_lower)
         for func in self._events.get("on_quit", tuple()):
             func(msg)
 
@@ -270,6 +282,11 @@ class DGGChat:
     def on_unmute(self, msg: Message):
         """Do stuff when a chatter is unmuted."""
         for func in self._events.get("on_unmute", tuple()):
+            func(msg)
+
+    def on_subonly(self, msg: Message):
+        """Do stuff when sub-only is turned on/off."""
+        for func in self._events.get("on_subonly", tuple()):
             func(msg)
 
     def on_refresh(self, msg: Message):
