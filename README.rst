@@ -1,5 +1,5 @@
 DGG-bot
-======
+=======
 
 .. image:: https://img.shields.io/pypi/v/dgg-bot.svg
    :target: https://pypi.python.org/pypi/dgg-bot
@@ -7,6 +7,7 @@ DGG-bot
 .. image:: https://img.shields.io/pypi/pyversions/dgg-bot.svg
    :target: https://pypi.python.org/pypi/dgg-bot
    :alt: PyPI supported Python versions
+
 A library for making a bot in Destiny.gg chat.
 
 Installing
