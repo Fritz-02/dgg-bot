@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=60.2"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "dgg-bot"
+version = "0.3.1"
+authors = [
+    { name="Fritz-02"},
+]
+description="A library for making a bot in Destiny.gg chat."
+readme = "README.rst"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Communications :: Chat"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Fritz-02/dgg-bot/"
+"Bug Tracker" = "https://github.com/Fritz-02/dgg-bot/issues"
