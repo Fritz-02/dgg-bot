@@ -6,7 +6,7 @@ setup(
     version="0.4.1",
     author="Fritz",
     description="A library for making a bot in Destiny.gg chat.",
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     url="https://github.com/Fritz-02/dgg-bot/",
     project_urls={
         "Bug Tracker": "https://github.com/Fritz-02/dgg-bot/issues",
