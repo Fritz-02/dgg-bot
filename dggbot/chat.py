@@ -28,8 +28,9 @@ class DGGChat:
 
     def __init__(self, auth_token=None, username: str = None, wss: str = None):
         self.username = username.lower() if isinstance(username, str) else None
+        self.wss = wss or self.WSS
         self.ws = websocket.WebSocketApp(
-            wss or self.WSS,
+            self.wss,
             cookie=f"authtoken={auth_token}" if auth_token else None,
             on_open=self._on_open,
             on_message=self._on_message,
@@ -207,7 +208,7 @@ class DGGChat:
         _logger.debug(
             f"Connecting "
             + (f"as {self.username} " if self.username else "")
-            + f"to {self.WSS}."
+            + f"to {self.wss}."
         )
         self._connected = True
 

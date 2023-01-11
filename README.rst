@@ -80,3 +80,27 @@ A simple bot with two commands and will yump back at chatters.
       while True:
          bot.run()
          time.sleep(2)
+
+
+Connecting to alternative DGG environments.
+
+.. code-block:: python
+
+   from dggbot import DGGBot
+   import time
+
+   bot = DGGBot("AUTH_TOKEN", 
+      username="Username", 
+      owner="Owner", 
+      prefix="$",
+      wss="wss://chat.omniliberal.dev/ws",
+      )
+
+   @bot.event()
+   def on_msg(msg):
+      print(msg)
+
+   if __name__ == "__main__":
+      while True:
+         bot.run(origin="https://www.omniliberal.dev")
+         time.sleep(2)
