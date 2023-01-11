@@ -1,6 +1,7 @@
 import dataclasses
 from datetime import datetime
 from ._logging import _logger
+from .user import User
 
 
 @dataclasses.dataclass
@@ -16,6 +17,10 @@ class Message:
     @property
     def nick_lower(self) -> str:
         return self.nick.lower()
+
+    @property
+    def user(self) -> User:
+        return User(self.nick, self.createdDate, self.features)
 
     def __post_init__(self):
         _logger.debug(self)
