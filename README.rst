@@ -94,7 +94,7 @@ Connecting to alternative DGG environments.
       owner="Owner", 
       prefix="$",
       wss="wss://chat.omniliberal.dev/ws",
-      )
+   )
 
    @bot.event()
    def on_msg(msg):
