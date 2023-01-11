@@ -7,8 +7,9 @@ class Message:
     chat: "DGGChat"
     type: str
     nick: str = None
+    createdDate: object = None
     features: list = None
-    timestamp: int = None
+    timestamp: object = None
     data: str = None
 
     @property
