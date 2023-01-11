@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from typing import Callable, Union
 import websocket
@@ -47,11 +47,11 @@ class DGGChat:
             else f"{self.__class__.__name__}()"
         )
 
-    def _dggtime_to_dt(self, timestamp: str) -> object:
+    def _dggtime_to_dt(self, timestamp: str) -> datetime:
         return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
 
-    def _dggepoch_to_dt(self, epoch: str) -> object:
-        return datetime.fromtimestamp(epoch // 1000)  # dgg sends miliseconds
+    def _dggepoch_to_dt(self, epoch: int) -> datetime:
+        return datetime.fromtimestamp(epoch // 1000, tz=timezone.utc)  # dgg sends miliseconds
 
     @property
     def users(self) -> dict:
