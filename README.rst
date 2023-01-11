@@ -13,7 +13,7 @@ A library for making a bot in Destiny.gg chat.
 Installing
 ----------
 
-**Python 3.8 or higher is required**
+**Python 3.9 or higher is required**
 
 .. code:: sh
 
