@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import json
 from typing import Callable, Union
 import websocket
@@ -46,6 +47,12 @@ class DGGChat:
             else f"{self.__class__.__name__}()"
         )
 
+    def _dggtime_to_dt(self, timestamp: str) -> datetime:
+        return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+
+    def _dggepoch_to_dt(self, epoch: int) -> datetime:
+        return datetime.fromtimestamp(epoch // 1000, tz=timezone.utc)  # dgg sends miliseconds
+
     @property
     def users(self) -> dict:
         return self._users.copy()
@@ -58,8 +65,9 @@ class DGGChat:
                 self,
                 event_type,
                 data["nick"],
+                self._dggtime_to_dt(data["createdDate"]),
                 data["features"],
-                data["timestamp"],
+                self._dggepoch_to_dt(data["timestamp"]),
                 data["data"],
             )
             self.on_msg(msg)
@@ -70,8 +78,9 @@ class DGGChat:
                 self,
                 event_type,
                 data["nick"],
+                self._dggtime_to_dt(data["createdDate"]),
                 data["features"],
-                data["timestamp"],
+                self._dggepoch_to_dt(data["timestamp"]),
                 data["data"],
                 data["duration"],
             )
@@ -81,8 +90,9 @@ class DGGChat:
                 self,
                 event_type,
                 data["nick"],
+                self._dggtime_to_dt(data["createdDate"]),
                 data["features"],
-                data["timestamp"],
+                self._dggepoch_to_dt(data["timestamp"]),
                 data["data"],
             )
             self.on_unmute(msg)
@@ -91,8 +101,9 @@ class DGGChat:
                 self,
                 event_type,
                 data["nick"],
+                self._dggtime_to_dt(data["createdDate"]),
                 data["features"],
-                data["timestamp"],
+                self._dggepoch_to_dt(data["timestamp"]),
                 data["data"],
             )
             self.on_ban(msg)
@@ -101,8 +112,9 @@ class DGGChat:
                 self,
                 event_type,
                 data["nick"],
+                self._dggtime_to_dt(data["createdDate"]),
                 data["features"],
-                data["timestamp"],
+                self._dggepoch_to_dt(data["timestamp"]),
                 data["data"],
             )
             self.on_unban(msg)
@@ -111,14 +123,18 @@ class DGGChat:
                 self,
                 event_type,
                 data["nick"],
+                self._dggtime_to_dt(data["createdDate"]),
                 data["features"],
-                data["timestamp"],
+                self._dggepoch_to_dt(data["timestamp"]),
                 data["data"],
             )
             self.on_subonly(msg)
         elif event_type == EventType.BROADCAST:
             msg = Message(
-                self, event_type, timestamp=data["timestamp"], data=data["data"]
+                self,
+                event_type,
+                timestamp=self._dggepoch_to_dt(data["timestamp"]),
+                data=data["data"],
             )
             self.on_broadcast(msg)
         elif event_type == EventType.PRIVMSG:
@@ -126,7 +142,7 @@ class DGGChat:
                 self,
                 event_type,
                 data["nick"],
-                timestamp=data["timestamp"],
+                timestamp=self._dggepoch_to_dt(data["timestamp"]),
                 data=data["data"],
                 message_id=data["messageid"],
             )
@@ -159,17 +175,29 @@ class DGGChat:
             self.on_names(data["connectioncount"], data["users"])
         elif event_type == EventType.JOIN:
             msg = Message(
-                self, event_type, data["nick"], data["features"], data["timestamp"]
+                self,
+                event_type,
+                data["nick"],
+                features=data["features"],
+                timestamp=self._dggepoch_to_dt(data["timestamp"]),
             )
             self.on_join(msg)
         elif event_type == EventType.QUIT:
             msg = Message(
-                self, event_type, data["nick"], data["features"], data["timestamp"]
+                self,
+                event_type,
+                data["nick"],
+                features=data["features"],
+                timestamp=self._dggepoch_to_dt(data["timestamp"]),
             )
             self.on_quit(msg)
         elif event_type == EventType.REFRESH:
             msg = Message(
-                self, event_type, data["nick"], data["features"], data["timestamp"]
+                self,
+                event_type,
+                data["nick"],
+                features=data["features"],
+                timestamp=self._dggepoch_to_dt(data["timestamp"]),
             )
             self.on_refresh(msg)
         else:

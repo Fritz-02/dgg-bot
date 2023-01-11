@@ -1,4 +1,5 @@
 import dataclasses
+from datetime import datetime
 from ._logging import _logger
 
 
@@ -7,8 +8,9 @@ class Message:
     chat: "DGGChat"
     type: str
     nick: str = None
+    createdDate: datetime = None
     features: list = None
-    timestamp: int = None
+    timestamp: datetime = None
     data: str = None
 
     @property
