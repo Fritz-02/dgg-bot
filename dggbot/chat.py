@@ -27,12 +27,23 @@ class DGGChat:
     WSS = "wss://chat.destiny.gg/ws"
     URL = "https://www.destiny.gg"
 
-    def __init__(self, auth_token=None, username: str = None, wss: str = None):
+    def __init__(self, auth_token=None, username: str = None, wss: str = None,
+                 *,
+                 sid: str = None,
+                 rememberme: str = None):
+
         self.username = username.lower() if isinstance(username, str) else None
         self.wss = wss or self.WSS
+        if auth_token:
+            cookie = f"authtoken={auth_token}"
+        elif sid:
+            cookie = f"sid={sid}" + (f";rememberme={rememberme}" if rememberme else "")
+        else:
+            cookie = None
+
         self.ws = websocket.WebSocketApp(
             self.wss,
-            cookie=f"authtoken={auth_token}" if auth_token else None,
+            cookie=cookie,
             on_open=self._on_open,
             on_message=self._on_message,
             on_error=self._on_error,
@@ -142,9 +153,8 @@ class DGGChat:
             f(msg)
         else:
             _logger.warning(f"Function '{func_name}' not found.")
-        if event_type in (EventType.MESSAGE, EventType.PRIVMSG):
-            if self.is_mentioned(msg):
-                self.on_mention(msg)
+        if event_type in (EventType.MESSAGE, EventType.PRIVMSG) and self.is_mentioned(msg):
+            self.on_mention(msg)
 
     def _on_open(self, ws):
         _logger.debug(
