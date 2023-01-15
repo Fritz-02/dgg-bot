@@ -61,7 +61,8 @@ class DGGBot(DGGChat):
                 if any(not perm(msg) for perm in perms):
                     return
             if len(func._args.args) == 2:
-                func(msg, msg.data.split(" ", 1)[1])
+                args = msg.data.split(" ", 1)
+                func(msg, args[1] if len(args) > 1 else None)
             else:
                 func(msg)
 
