@@ -5,32 +5,23 @@ bot = DGGBot("AUTH_TOKEN", username="Bot", owner="Owner")
 
 
 @bot.command()
-def mmmmphone(msg):
-    """Replies with the following message."""
-    msg.reply("📞 MMMM")
+def ping(msg):
+    msg.reply("Pong")
 
 
+# Aliases
 @bot.command(aliases=["obamna"])
-def obamna_cmd(msg):
-    msg.reply("OBAMNA LULW")
+def twitter(msg):
+    """Replies with the following message. Aliases are optional, the function name is the same as the command name."""
+    msg.reply("#youtube/tZ_gn0E87Qo LULW")
 
 
+# Owner-only commands
 @bot.command()
 @bot.is_owner()
 def test(msg):
     """Test command that is restricted to only the bot owner."""
     msg.reply("Test 123")
-
-
-def is_admin(msg):
-    """Check to restrict commands to only the following users."""
-    return msg.nick in ("RightToBearArmsLOL", "Cake", "Destiny")
-
-
-@bot.command(aliases=["admin"])
-@bot.check(is_admin)
-def admin_only_command(msg):
-    msg.reply(f"{msg.nick} BINGQILIN nathanTiny2")
 
 
 while True:

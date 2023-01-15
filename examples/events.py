@@ -11,14 +11,14 @@ def on_msg(msg: Message):
     print(f"{msg.nick}: {msg.data}")
 
 
-@bot.event('on_privmsg')
+@bot.event("on_privmsg")
 def whispered(msg: PrivateMessage):
     """Prints the whispered message."""
     print(f"{msg.nick} whispered to you: {msg.data}")
 
 
-@bot.event('on_ban')
-@bot.event('on_mute')
+@bot.event("on_ban")
+@bot.event("on_mute")
 def ducked(msg: Union[Message, MuteMessage]):
     """Types DuckerZ at the chatter who was banned or muted."""
     time.sleep(1)

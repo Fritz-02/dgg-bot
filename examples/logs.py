@@ -2,7 +2,7 @@ from dggbot import DGGChat, Message
 import time
 
 
-chat = DGGChat()  # no auth_token is needed when you only need to view chat
+chat = DGGChat()  # no auth_token is needed when you only need to read chat
 
 
 def write_to_file(msg: Message):
