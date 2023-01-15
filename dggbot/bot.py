@@ -15,9 +15,15 @@ class DGGBot(DGGChat):
         wss: str = None,
         *,
         sid: str = None,
-        rememberme: str = None
+        rememberme: str = None,
     ):
-        super().__init__(auth_token=auth_token, username=username, wss=wss, sid=sid, rememberme=rememberme)
+        super().__init__(
+            auth_token=auth_token,
+            username=username,
+            wss=wss,
+            sid=sid,
+            rememberme=rememberme,
+        )
         self._owner = owner.lower() if owner else None
         self.prefix = prefix
         self._commands = {}

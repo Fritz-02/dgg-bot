@@ -1,4 +1,3 @@
-
 class AccountTooYoung(Exception):
     pass
 

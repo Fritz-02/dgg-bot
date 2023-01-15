@@ -27,10 +27,15 @@ class DGGChat:
     WSS = "wss://chat.destiny.gg/ws"
     URL = "https://www.destiny.gg"
 
-    def __init__(self, auth_token=None, username: str = None, wss: str = None,
-                 *,
-                 sid: str = None,
-                 rememberme: str = None):
+    def __init__(
+        self,
+        auth_token=None,
+        username: str = None,
+        wss: str = None,
+        *,
+        sid: str = None,
+        rememberme: str = None,
+    ):
 
         self.username = username.lower() if isinstance(username, str) else None
         self.wss = wss or self.WSS
@@ -64,7 +69,9 @@ class DGGChat:
         return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
 
     def _dggepoch_to_dt(self, epoch: int) -> datetime:
-        return datetime.fromtimestamp(epoch // 1000, tz=timezone.utc)  # dgg sends miliseconds
+        return datetime.fromtimestamp(
+            epoch // 1000, tz=timezone.utc
+        )  # dgg sends miliseconds
 
     @property
     def users(self) -> dict:
@@ -103,7 +110,10 @@ class DGGChat:
             )
         elif event_type == EventType.BROADCAST:
             msg = Message(
-                self, event_type, timestamp=self._dggepoch_to_dt(data["timestamp"]), data=data["data"]
+                self,
+                event_type,
+                timestamp=self._dggepoch_to_dt(data["timestamp"]),
+                data=data["data"],
             )
         elif event_type == EventType.PRIVMSG:
             msg = PrivateMessage(
@@ -126,15 +136,17 @@ class DGGChat:
             _logger.debug(f"{event_type} {data}")
             self.on_names(data["connectioncount"], data["users"])
             return
-        elif event_type in (EventType.MESSAGE,
-                            EventType.UNMUTE,
-                            EventType.BAN,
-                            EventType.UNBAN,
-                            EventType.SUBONLY,
-                            EventType.BROADCAST,
-                            EventType.JOIN,
-                            EventType.QUIT,
-                            EventType.REFRESH):
+        elif event_type in (
+            EventType.MESSAGE,
+            EventType.UNMUTE,
+            EventType.BAN,
+            EventType.UNBAN,
+            EventType.SUBONLY,
+            EventType.BROADCAST,
+            EventType.JOIN,
+            EventType.QUIT,
+            EventType.REFRESH,
+        ):
             msg = Message(
                 self,
                 event_type,
@@ -153,7 +165,9 @@ class DGGChat:
             f(msg)
         else:
             _logger.warning(f"Function '{func_name}' not found.")
-        if event_type in (EventType.MESSAGE, EventType.PRIVMSG) and self.is_mentioned(msg):
+        if event_type in (EventType.MESSAGE, EventType.PRIVMSG) and self.is_mentioned(
+            msg
+        ):
             self.on_mention(msg)
 
     def _on_open(self, ws):
@@ -208,7 +222,10 @@ class DGGChat:
     def on_names(self, connection_count: int, users: list):
         """Do stuff when the NAMES message is received upon connecting to chat."""
         self._users = {
-            user["nick"].lower(): User(user["nick"], self._dggtime_to_dt(user["createdDate"]), user["features"]) for user in users
+            user["nick"].lower(): User(
+                user["nick"], self._dggtime_to_dt(user["createdDate"]), user["features"]
+            )
+            for user in users
         }
         for func in self._events.get("on_names", tuple()):
             func(connection_count, users)
