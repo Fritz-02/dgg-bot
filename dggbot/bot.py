@@ -66,11 +66,10 @@ class DGGBot(DGGChat):
                 perms = func._perms
                 if any(not perm(msg) for perm in perms):
                     return
-            if len(func._args.args) == 2:
-                args = msg.data.split(" ", 1)
-                func(msg, args[1] if len(args) > 1 else None)
-            else:
-                func(msg)
+            args = msg.data.split(" ", len(func._args.args) - (not func._args.varargs))[
+                1:
+            ]
+            func(msg, *args)
 
     def check(self, *check_funcs: Callable):
         """
