@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="dgg-bot",
-    version="0.5.0",
+    version="0.6.0",
     author="Fritz",
     description="A library for making a bot in Destiny.gg chat.",
     long_description_content_type="text/x-rst",
@@ -16,6 +16,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.10",
         "Topic :: Communications :: Chat",
     ],
