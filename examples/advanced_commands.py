@@ -1,5 +1,6 @@
 from dggbot import DGGBot
 import time
+from typing import Optional
 
 bot = DGGBot(
     username="Bot",
@@ -11,18 +12,30 @@ bot = DGGBot(
 
 # Command arguments
 @bot.command()
-def hug(msg, arg: str):
-    """Hugs whatever is typed after the command, or the user calling it."""
-    msg.reply(f"TeddyPepe {arg if arg else msg.nick} TeddyPepe")
+def say(msg, arg: str):
+    """Say whatever was typed after the command."""
+    msg.reply(arg)
 
 
 @bot.command()
-def logs(msg, username: str = None):
+def hug(msg, nick: Optional[str] = None, *_):
+    """Hugs whoever/whatever is typed right after the command, or the user calling it.
+    Only the first name/word after the command is included, rest is discarded."""
+    msg.reply(f"TeddyPepe {nick if nick else msg.nick} TeddyPepe")
+
+
+@bot.command()
+def ignore(msg, username: str, reason: Optional[str] = None):
+    """Ignores the username, with an optional reason given. (doesn't actually do anything)"""
+    msg.reply(f"Ignoring {username}." + (f" Reason: {reason}" if reason else ""))
+    # Could add some functionality to ignore any messages/commands from the given username outside of this example
+
+
+@bot.command(["log"])
+def logs(msg, username: Optional[str] = None, *_):
     """Link logs of given username, or command user's."""
     if not username:
         username = msg.nick
-    elif " " in username:
-        username = username.split(" ")[0]
     msg.reply(f"https://rustlesearch.dev/?username={username}&channel=Destinygg")
 
 
