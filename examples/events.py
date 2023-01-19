@@ -41,6 +41,4 @@ def on_join(msg):
         trigger = False
 
 
-while True:
-    bot.run()
-    time.sleep(2)
+bot.run_forever()
