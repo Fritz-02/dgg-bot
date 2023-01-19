@@ -52,6 +52,4 @@ def cake(msg):
     msg.reply("🎂")
 
 
-while True:
-    bot.run(origin="https://www.omniliberal.dev")
-    time.sleep(2)
+bot.run_forever(origin="https://www.omniliberal.dev")

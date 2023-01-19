@@ -16,7 +16,4 @@ def on_msg(msg):
     write_to_file(msg)
 
 
-while True:
-    # Connect back to chat when disconnected after 2 seconds.
-    chat.run()
-    time.sleep(2)
+chat.run_forever()

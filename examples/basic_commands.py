@@ -24,6 +24,4 @@ def test(msg):
     msg.reply("Test 123")
 
 
-while True:
-    bot.run()
-    time.sleep(2)
+bot.run_forever()

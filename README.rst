@@ -86,9 +86,7 @@ A simple bot with three commands and will yump back at chatters.
             msg.reply(f"{msg.nick} MiyanoHype")
 
     if __name__ == "__main__":
-        while True:
-            bot.run()
-            time.sleep(2)
+        bot.run_forever()
 
 
 Connecting to alternative DGG environments.
@@ -111,6 +109,4 @@ Connecting to alternative DGG environments.
         print(msg)
 
     if __name__ == "__main__":
-        while True:
-            bot.run(origin="https://www.omniliberal.dev")
-            time.sleep(2)
+        bot.run_forever(origin="https://www.omniliberal.dev")
