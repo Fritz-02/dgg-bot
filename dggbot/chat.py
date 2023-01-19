@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 import json
+import time
 from typing import Callable, Union
 import websocket
 
@@ -238,6 +239,12 @@ class DGGChat:
 
     def run(self, origin: str = None):
         self.ws.run_forever(origin=origin or self.URL)
+
+    def run_forever(self, origin: str = None, sleep: int = 2):
+        """Runs the client forever by automatically reconnecting the websocket."""
+        while True:
+            self.run(origin=origin or self.URL)
+            time.sleep(sleep)
 
     @threaded
     def send(self, msg: str):
