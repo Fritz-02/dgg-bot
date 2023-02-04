@@ -7,7 +7,7 @@ import websocket
 from .event import EventType
 from ._logging import _logger
 from .funcs import threaded
-from .message import Message, PrivateMessage, MuteMessage
+from .message import Message, MuteMessage, PinnedMessage, PrivateMessage
 from .user import User
 from .errors import (
     AccountTooYoung,
@@ -137,6 +137,17 @@ class DGGChat:
             _logger.debug(f"{event_type} {data}")
             self.on_names(data["connectioncount"], data["users"])
             return
+        elif event_type == EventType.PIN:
+            msg = PinnedMessage(
+                self,
+                event_type,
+                data["nick"],
+                self._dggtime_to_dt(data["createdDate"]),
+                data["features"],
+                self._dggepoch_to_dt(data["timestamp"]),
+                data.get("data"),
+                data["uuid"],
+            )
         elif event_type in (
             EventType.MESSAGE,
             EventType.UNMUTE,
@@ -230,6 +241,12 @@ class DGGChat:
         }
         for func in self._events.get("on_names", tuple()):
             func(connection_count, users)
+
+    @threaded
+    def on_pin(self, msg: PinnedMessage):
+        """Do stuff when a PIN is received."""
+        for func in self._events.get("on_pin", tuple()):
+            func(msg)
 
     @threaded
     def on_privmsg(self, msg: PrivateMessage):

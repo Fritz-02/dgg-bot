@@ -30,13 +30,18 @@ class Message:
 
 
 @dataclasses.dataclass
+class MuteMessage(Message):
+    duration: int = None
+
+
+@dataclasses.dataclass
+class PinnedMessage(Message):
+    uuid: str = None
+
+
+@dataclasses.dataclass
 class PrivateMessage(Message):
     message_id: str = None
 
     def reply(self, content):
         self.chat.send_privmsg(self.nick, content)
-
-
-@dataclasses.dataclass
-class MuteMessage(Message):
-    duration: int = None

@@ -9,6 +9,7 @@ class EventType:
     MESSAGE = "MSG"
     MUTE = "MUTE"
     NAMES = "NAMES"
+    PIN = "PIN"
     PRIVMSG = "PRIVMSG"
     PRIVMSGSENT = "PRIVMSGSENT"
     QUIT = "QUIT"
