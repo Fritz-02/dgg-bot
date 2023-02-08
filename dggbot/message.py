@@ -2,7 +2,6 @@ import dataclasses
 from datetime import datetime
 from ._logging import _logger
 from .user import User
-from typing import List
 
 
 @dataclasses.dataclass
@@ -62,8 +61,8 @@ class PollMessage(_MessageBase):
     # Poll time is in milliseconds
     time: int = None
     question: str = None
-    options: List[str] = None
-    totals: List[int] = None
+    options: list[str] = None
+    totals: list[int] = None
     totalvotes: int = None
 
     def vote(self, option: int):
