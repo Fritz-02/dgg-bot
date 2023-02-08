@@ -6,25 +6,29 @@ from typing import List
 
 
 @dataclasses.dataclass
-class Message:
+class _MessageBase:
     chat: "DGGChat"
     type: str
     nick: str = None
+
+    @property
+    def nick_lower(self) -> str:
+        return self.nick.lower()
+
+    def __post_init__(self):
+        _logger.debug(self)
+
+
+@dataclasses.dataclass
+class Message(_MessageBase):
     createdDate: datetime = None
     features: list = None
     timestamp: datetime = None
     data: str = None
 
     @property
-    def nick_lower(self) -> str:
-        return self.nick.lower()
-
-    @property
     def user(self) -> User:
         return User(self.nick, self.createdDate, self.features)
-
-    def __post_init__(self):
-        _logger.debug(self)
 
     def reply(self, content):
         self.chat.send(content)
