@@ -53,7 +53,7 @@ class PrivateMessage(Message):
 
 
 @dataclasses.dataclass
-class PollMessage(Message):
+class PollMessage(_MessageBase):
     canvote: bool = None
     myvote: int = None
     weighted: bool = None
@@ -66,7 +66,10 @@ class PollMessage(Message):
     totals: List[int] = None
     totalvotes: int = None
 
+    def vote(self, option: int):
+        self.chat.cast_vote(option)
+
 
 @dataclasses.dataclass
-class VoteMessage(Message):
+class VoteMessage(_MessageBase):
     vote: str = None

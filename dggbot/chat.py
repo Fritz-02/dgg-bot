@@ -165,7 +165,7 @@ class DGGChat:
                 myvote=data["myvote"],
                 weighted=data["weighted"],
                 start=self._dggtime_to_dt(data["start"]),
-                now=self._dggtime_to_dt(data["start"]),
+                now=self._dggtime_to_dt(data["now"]),
                 # Time comes in milliseconds
                 time=data["time"] // 1000,
                 question=data["question"],
@@ -306,6 +306,12 @@ class DGGChat:
         """Send private message to someone."""
         payload = {"nick": nick, "data": msg}
         self.ws.send(f"PRIVMSG {json.dumps(payload)}")
+
+    @threaded
+    def cast_vote(self, vote: int):
+        """Participate in a chat poll."""
+        payload = {"vote": str(vote)}
+        self.ws.send(f"CASTVOTE {json.dumps(payload)}")
 
     @threaded
     def on_broadcast(self, msg):
