@@ -7,7 +7,14 @@ import websocket
 from .event import EventType
 from ._logging import _logger
 from .funcs import threaded
-from .message import Message, MuteMessage, PinnedMessage, PrivateMessage
+from .message import (
+    Message,
+    MuteMessage,
+    PinnedMessage,
+    PollMessage,
+    PrivateMessage,
+    VoteMessage,
+)
 from .user import User
 from .errors import (
     AccountTooYoung,
@@ -67,6 +74,7 @@ class DGGChat:
         )
 
     def _dggtime_to_dt(self, timestamp: str) -> datetime:
+        timestamp = timestamp.replace("+0000", "Z")
         return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
 
     def _dggepoch_to_dt(self, epoch: int) -> datetime:
@@ -147,6 +155,30 @@ class DGGChat:
                 self._dggepoch_to_dt(data["timestamp"]),
                 data.get("data"),
                 data["uuid"],
+            )
+        elif event_type in (EventType.POLLSTART, EventType.POLLSTOP):
+            msg = PollMessage(
+                self,
+                event_type,
+                data["nick"],
+                canvote=data["canvote"],
+                myvote=data["myvote"],
+                weighted=data["weighted"],
+                start=self._dggtime_to_dt(data["start"]),
+                now=self._dggtime_to_dt(data["start"]),
+                # Time comes in milliseconds
+                time=data["time"] // 1000,
+                question=data["question"],
+                options=data["options"],
+                totals=data["totals"],
+                totalvotes=data["totalvotes"],
+            )
+        elif event_type == EventType.VOTECAST:
+            msg = VoteMessage(
+                self,
+                event_type,
+                data["nick"],
+                vote=data["vote"],
             )
         elif event_type in (
             EventType.MESSAGE,
@@ -329,4 +361,22 @@ class DGGChat:
     def on_refresh(self, msg: Message):
         """Do stuff when refreshed."""
         for func in self._events.get("on_refresh", tuple()):
+            func(msg)
+
+    @threaded
+    def on_pollstart(self, msg: PollMessage):
+        """Do stuff when a poll is started."""
+        for func in self._events.get("on_pollstart", tuple()):
+            func(msg)
+
+    @threaded
+    def on_pollstop(self, msg: PollMessage):
+        """Do stuff when a poll is ended."""
+        for func in self._events.get("on_pollstop", tuple()):
+            func(msg)
+
+    @threaded
+    def on_votecast(self, msg: VoteMessage):
+        """Do stuff when a vote is cast in a poll."""
+        for func in self._events.get("on_votecast", tuple()):
             func(msg)

@@ -10,6 +10,8 @@ class EventType:
     MUTE = "MUTE"
     NAMES = "NAMES"
     PIN = "PIN"
+    POLLSTART = "POLLSTART"
+    POLLSTOP = "POLLSTOP"
     PRIVMSG = "PRIVMSG"
     PRIVMSGSENT = "PRIVMSGSENT"
     QUIT = "QUIT"
@@ -17,6 +19,7 @@ class EventType:
     SUBONLY = "SUBONLY"
     UNBAN = "UNBAN"
     UNMUTE = "UNMUTE"
+    VOTECAST = "VOTECAST"
 
     @classmethod
     @cache
