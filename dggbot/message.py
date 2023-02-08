@@ -49,3 +49,26 @@ class PrivateMessage(Message):
 
     def reply(self, content):
         self.chat.send_privmsg(self.nick, content)
+
+
+@dataclasses.dataclass
+class PollMessage(_MessageBase):
+    canvote: bool = None
+    myvote: int = None
+    weighted: bool = None
+    start: datetime = None
+    now: datetime = None
+    # Poll time is in milliseconds
+    time: int = None
+    question: str = None
+    options: list[str] = None
+    totals: list[int] = None
+    totalvotes: int = None
+
+    def vote(self, option: int):
+        self.chat.cast_vote(option)
+
+
+@dataclasses.dataclass
+class VoteMessage(_MessageBase):
+    vote: str = None
