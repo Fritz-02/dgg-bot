@@ -1,6 +1,6 @@
 import inspect
 import itertools
-from typing import List, Tuple, Union, Callable
+from typing import Callable, Union
 from .message import Message, PrivateMessage
 from .chat import DGGChat
 
@@ -30,7 +30,7 @@ class DGGBot(DGGChat):
 
     def command(
         self,
-        aliases: Union[List[str], Tuple[str]] = tuple(),
+        aliases: Union[list[str], tuple[str]] = tuple(),
         *args,
         whisper_only: bool = False,
         **kwargs,
