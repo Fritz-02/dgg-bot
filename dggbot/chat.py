@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import json
 import time
 from typing import Callable, Union
@@ -63,6 +63,8 @@ class DGGChat:
             on_close=self._on_close,
         )
         self._connected = False
+        self._connected_at = None
+        self._joined = False
         self._events = {}
         self._users = {}
 
@@ -221,10 +223,14 @@ class DGGChat:
             + f"to {self.wss}."
         )
         self._connected = True
+        self._connected_at = datetime.now(timezone.utc)
+        if self.username:
+            self.check_joined()
 
     def _on_close(self, ws, *_):
         _logger.debug(f"Connection closed.")
         self._connected = False
+        self._joined = False
 
     def _on_error(self, ws, error):
         _logger.error(error)
@@ -249,6 +255,14 @@ class DGGChat:
         return (
             False if self.username is None else (self.username in msg.data.casefold())
         )
+
+    @threaded
+    def check_joined(self):
+        time.sleep(5)
+        if not self._joined:
+            _logger.warning(
+                f"{self.username} didn't join. Authentication may have failed."
+            )
 
     @threaded
     def on_mention(self, msg):
@@ -323,6 +337,10 @@ class DGGChat:
     def on_join(self, msg: Message):
         """Do stuff when chatter joins."""
         self._users[msg.nick_lower] = User(msg.nick, msg.createdDate, msg.features)
+        if msg.nick_lower == self.username:
+            if (msg.timestamp - self._connected_at) <= timedelta(seconds=5):
+                self._joined = True
+                _logger.info(f"Connected as {self.username} to {self.wss}")
         for func in self._events.get("on_join", tuple()):
             func(msg)
 
