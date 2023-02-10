@@ -1,7 +1,7 @@
 from dggbot import DGGBot
 import time
 
-bot = DGGBot("AUTH_TOKEN", username="Bot", owner="Owner")
+bot = DGGBot("AUTH_TOKEN", owner="Owner")
 
 
 @bot.command()

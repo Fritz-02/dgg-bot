@@ -2,7 +2,7 @@ from dggbot import DGGBot, Message, PrivateMessage, MuteMessage
 from typing import Union
 import time
 
-bot = DGGBot("AUTH_TOKEN", username="Bot", owner="Owner")
+bot = DGGBot("AUTH_TOKEN", owner="Owner")
 
 
 @bot.event()

@@ -42,13 +42,12 @@ A simple bot with three commands and will yump back at chatters.
 
     bot = DGGBot(
         "AUTH_TOKEN",
-        username="Username",
         owner="Owner",
-        prefix="$"
+        prefix="$",
     )  # default command prefix is "!"
 
     @bot.command()
-    @bot.is_owner()  # only the owner named above can use this command.
+    @bot.is_owner()  # only the owner named in DGGBot can use this command.
     def test(msg):  # $test
         msg.reply("Test 123")
 
@@ -97,11 +96,11 @@ Connecting to alternative DGG environments.
     import time
 
     bot = DGGBot(
-        "AUTH_TOKEN",
-        username="Username",
         owner="Owner",
         prefix="$",
         wss="wss://chat.omniliberal.dev/ws",
+        sid="SID",
+        rememberme="REMEMBERME",
     )
 
     @bot.event()
@@ -109,4 +108,4 @@ Connecting to alternative DGG environments.
         print(msg)
 
     if __name__ == "__main__":
-        bot.run_forever(origin="https://www.omniliberal.dev")
+         bot.run_forever(origin="https://www.omniliberal.dev")

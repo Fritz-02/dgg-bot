@@ -3,7 +3,6 @@ import time
 from typing import Optional
 
 bot = DGGBot(
-    username="Bot",
     owner="Owner",
     wss="wss://chat.omniliberal.dev/ws",
     sid="SID",
