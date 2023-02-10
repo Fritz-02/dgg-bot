@@ -246,7 +246,7 @@ class DGGChat:
             self.on_mention(msg)
 
     def _on_open(self, ws):
-        _logger.debug(
+        _logger.info(
             f"Connecting "
             + (f"as {self.username} " if self.username else "")
             + f"to {self.wss}."
