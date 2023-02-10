@@ -1,7 +1,9 @@
 from datetime import datetime, timezone
 import json
+import requests
 import time
 from typing import Callable, Union
+import warnings
 import websocket
 
 from .event import EventType
@@ -38,21 +40,28 @@ class DGGChat:
     def __init__(
         self,
         auth_token=None,
-        username: str = None,
         wss: str = None,
         *,
         sid: str = None,
         rememberme: str = None,
+        **kwargs,
     ):
-
-        self.username = username.lower() if isinstance(username, str) else None
+        if (
+            "username" in kwargs
+        ):  # remove this after the first update on or after 12 March 2023
+            message = "The 'username' variable has been deprecated as of 0.9.0"
+            warnings.warn(message, DeprecationWarning, stacklevel=2)
+            _logger.warning(message)
+        self.authenticated = False
         self.wss = wss or self.WSS
+        cookie = None
+        self.username = None
         if auth_token:
             cookie = f"authtoken={auth_token}"
+            self.username = self._get_username_from_token(auth_token)
         elif sid:
             cookie = f"sid={sid}" + (f";rememberme={rememberme}" if rememberme else "")
-        else:
-            cookie = None
+            self.username = self._get_username_from_sid(cookie)
 
         self.ws = websocket.WebSocketApp(
             self.wss,
@@ -80,7 +89,29 @@ class DGGChat:
     def _dggepoch_to_dt(self, epoch: int) -> datetime:
         return datetime.fromtimestamp(
             epoch // 1000, tz=timezone.utc
-        )  # dgg sends miliseconds
+        )  # dgg sends milliseconds
+
+    def _get_username_from_token(self, auth_token: str) -> Union[str, None]:
+        r = requests.get(f"{self.URL}/api/userinfo?token={auth_token}")
+        resp = r.json()
+        if "username" in resp:
+            return resp["username"].lower()
+        else:
+            _logger.error(
+                f"Could not get username from token: {resp.get('message', 'Unknown reason.')}"
+            )
+
+    def _get_username_from_sid(self, cookie: str) -> Union[str, None]:
+        headers = {"cookie": cookie}
+        r = requests.get(f"{self.URL}/api/chat/me", headers=headers)
+        resp = r.json()
+        if r.status_code == 200:
+            resp = r.json()
+            return resp["nick"].lower()
+        else:
+            _logger.error(
+                f"Authentication failed. Error {resp['code']}: {resp['error']}"
+            )
 
     @property
     def users(self) -> dict:

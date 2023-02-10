@@ -9,20 +9,20 @@ class DGGBot(DGGChat):
     def __init__(
         self,
         auth_token: str = None,
-        username: str = None,
         owner: str = None,
         prefix="!",
         wss: str = None,
         *,
         sid: str = None,
         rememberme: str = None,
+        **kwargs,
     ):
         super().__init__(
             auth_token=auth_token,
-            username=username,
             wss=wss,
             sid=sid,
             rememberme=rememberme,
+            kwargs=kwargs,
         )
         self._owner = owner.lower() if owner else None
         self.prefix = prefix
