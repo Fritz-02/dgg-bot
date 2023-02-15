@@ -11,7 +11,7 @@ authors = [
 description="A library for making a bot in Destiny.gg chat."
 readme = "README.rst"
 requires-python = ">=3.9"
-license = "MIT"
+license = {text = "MIT"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
@@ -21,14 +21,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Topic :: Communications :: Chat"
 ]
-dependencies = [
-    "requests",
-    "websocket-client"
-]
-[project.optional-dependencies]
-lint = [
-    "black",
-]
+dynamic = ["dependencies"]
+
 [project.urls]
 "Homepage" = "https://github.com/Fritz-02/dgg-bot/"
 "Bug Tracker" = "https://github.com/Fritz-02/dgg-bot/issues"
@@ -41,3 +35,6 @@ target-version = ['py39']
 profile = "black"
 py_version = 38
 line_length = 88
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
