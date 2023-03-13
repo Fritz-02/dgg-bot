@@ -1,0 +1,10 @@
+{
+  "wss": "wss://chat.destiny.gg/ws",
+  "wss-origin": "https://www.destiny.gg",
+  "baseurl": "https://www.destiny.gg",
+  "endpoints": {
+    "user": "/api/chat/me",
+    "userinfo": "/api/userinfo"
+  },
+  "flairs": "https://cdn.destiny.gg/flairs/flairs.json"
+}

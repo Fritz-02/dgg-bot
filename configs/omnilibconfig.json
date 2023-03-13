@@ -1,0 +1,10 @@
+{
+  "wss": "wss://chat.omniliberal.dev/ws",
+  "wss-origin": "https://www.omniliberal.dev",
+  "baseurl": "https://www.omniliberal.dev",
+  "endpoints": {
+    "user": "/api/chat/me",
+    "userinfo": "/api/userinfo"
+  },
+  "flairs": "https://cdn.omniliberal.dev/flairs/flairs.json"
+}
