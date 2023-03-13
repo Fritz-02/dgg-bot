@@ -93,14 +93,21 @@ Connecting to alternative DGG environments.
 .. code-block:: python
 
     from dggbot import DGGBot
-    import time
 
     bot = DGGBot(
         owner="Owner",
         prefix="$",
-        wss="wss://chat.omniliberal.dev/ws",
         sid="SID",
         rememberme="REMEMBERME",
+        config={
+            {
+                "wss": "wss://chat.omniliberal.dev/ws",
+                "wss-origin": "https://www.omniliberal.dev",
+                "baseurl": "https://www.omniliberal.dev",
+                "endpoints": {"user": "/api/chat/me", "userinfo": "/api/userinfo"},
+                "flairs": "https://cdn.omniliberal.dev/flairs/flairs.json",
+            }
+        },
     )
 
     @bot.event()
@@ -108,4 +115,4 @@ Connecting to alternative DGG environments.
         print(msg)
 
     if __name__ == "__main__":
-         bot.run_forever(origin="https://www.omniliberal.dev")
+        bot.run_forever()
