@@ -51,15 +51,21 @@ class DGGChat(WSBase):
         config: Union[str, dict[str, dict]] = None,
         **kwargs,
     ):
-        cookie = None
         self.username = None
+        cookie = (
+            f"authtoken={auth_token}"
+            if auth_token
+            else (
+                f"sid={sid}" + (f";rememberme={rememberme}" if rememberme else "")
+                if sid
+                else None
+            )
+        )
+        super().__init__(wss, cookie, config=config)
         if auth_token:
-            cookie = f"authtoken={auth_token}"
             self.username = self._get_username_from_token(auth_token)
         elif sid:
-            cookie = f"sid={sid}" + (f";rememberme={rememberme}" if rememberme else "")
             self.username = self._get_username_from_sid(cookie)
-        super().__init__(wss, cookie, config=config)
         self._flairs = flair_converter(self.config["flairs"])
         self.authenticated = False
         self._users = {}
@@ -228,6 +234,11 @@ class DGGChat(WSBase):
             msg
         ):
             self.on_event("mention", msg)
+        self._post_message(msg)
+
+    def _post_message(self, msg):
+        """Do stuff after _on_message"""
+        pass
 
     def _on_open(self, ws):
         _logger.info(

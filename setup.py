@@ -16,7 +16,7 @@ extra_require = {"dev": ["black", "flake8"]}
 
 setup(
     name="dgg-bot",
-    version="0.10.0",
+    version="0.10.1",
     author="Fritz",
     description="A library for making a bot in Destiny.gg chat.",
     long_description=readme,

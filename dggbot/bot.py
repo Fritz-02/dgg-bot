@@ -2,7 +2,7 @@ import inspect
 import itertools
 from typing import Callable, Union
 from .message import Message, PrivateMessage
-from .chat import DGGChat
+from .chat import DGGChat, EventType
 
 
 class DGGBot(DGGChat):
@@ -18,11 +18,7 @@ class DGGBot(DGGChat):
         **kwargs,
     ):
         super().__init__(
-            auth_token=auth_token,
-            wss=wss,
-            sid=sid,
-            rememberme=rememberme,
-            kwargs=kwargs,
+            auth_token=auth_token, wss=wss, sid=sid, rememberme=rememberme, **kwargs
         )
         self._owner = owner.lower() if owner else None
         self.prefix = prefix
@@ -90,12 +86,6 @@ class DGGBot(DGGChat):
         """Decorator to make command only usable by the bot owner."""
         return self.check(lambda msg: msg.nick.lower() == self._owner)
 
-    def on_msg(self, msg: Message):
-        super().on_msg(msg)
-        if self.is_command(msg):
-            self.on_command(msg)
-
-    def on_privmsg(self, msg: PrivateMessage):
-        super().on_privmsg(msg)
-        if self.is_command(msg):
+    def _post_message(self, msg: Message):
+        if self.is_command(msg) and msg.type in (EventType.MESSAGE, EventType.PRIVMSG):
             self.on_command(msg)

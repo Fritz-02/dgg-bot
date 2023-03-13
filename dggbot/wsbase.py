@@ -29,7 +29,6 @@ class WSBase(ABC):
             self.config = config
         else:
             self.config = self._CONFIG
-
         self.wss = wss or self.config["wss"]
         self.ws = websocket.WebSocketApp(
             self.wss,
