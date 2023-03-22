@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dgg-bot"
-version = "0.11.0"
 authors = [
     { name="Fritz-02"},
 ]
@@ -21,11 +20,14 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Topic :: Communications :: Chat"
 ]
-dynamic = ["dependencies"]
+dynamic = ["dependencies", "version"]
 
 [project.urls]
 "Homepage" = "https://github.com/Fritz-02/dgg-bot/"
 "Bug Tracker" = "https://github.com/Fritz-02/dgg-bot/issues"
+
+[project.optional-dependencies]
+dev = ["black", "flake8"]
 
 [tool.black]
 line-length = 88
@@ -38,3 +40,8 @@ line_length = 88
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
+version = {attr = "dggbot.VERSION"}
+
+[tool.setuptools.packages.find]
+include = ["dggbot*"]
+exclude = ["configs*"]
