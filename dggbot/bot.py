@@ -1,8 +1,9 @@
 import inspect
 import itertools
+import time
 from typing import Callable, Union
-from .message import Message, PrivateMessage
 from .chat import DGGChat, EventType
+from .message import Message, PrivateMessage
 
 
 class DGGBot(DGGChat):
@@ -23,6 +24,9 @@ class DGGBot(DGGChat):
         self._owner = owner.lower() if owner else None
         self.prefix = prefix
         self._commands = {}
+        bot_config = self.config.get("bot", dict())
+        self._send_cooldown = bot_config.get("sendMsgCooldown", 0)
+        self._last_send_time = None
 
     def command(
         self,
@@ -100,3 +104,10 @@ class DGGBot(DGGChat):
     def _post_message(self, msg: Message):
         if msg.type in (EventType.MESSAGE, EventType.PRIVMSG) and self.is_command(msg):
             self.on_command(msg)
+
+    def send(self, msg: str):
+        if self._last_send_time is not None and self._send_cooldown:
+            if (time.time() - self._last_send_time) < self._send_cooldown:
+                return
+        super().send(msg)
+        self._last_send_time = time.time()

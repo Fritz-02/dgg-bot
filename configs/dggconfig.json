@@ -6,5 +6,8 @@
     "user": "/api/chat/me",
     "userinfo": "/api/userinfo"
   },
-  "flairs": "https://cdn.destiny.gg/flairs/flairs.json"
+  "flairs": "https://cdn.destiny.gg/flairs/flairs.json",
+  "bot": {
+    "sendMsgCooldown": 0
+  }
 }
