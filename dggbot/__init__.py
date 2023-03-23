@@ -4,4 +4,4 @@ from .event import EventType
 from .live import DGGLive, StreamInfo, YoutubeVideo, YoutubeVod
 from .message import Message, PrivateMessage, MuteMessage, PinnedMessage
 
-VERSION = "0.11.1"
+VERSION = "0.12.0"
