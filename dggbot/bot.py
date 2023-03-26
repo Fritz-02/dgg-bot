@@ -1,6 +1,6 @@
 import inspect
 import itertools
-from datetime import datetime
+import time
 from typing import Callable, Union
 from .chat import DGGChat, EventType
 from .message import Message, PrivateMessage
@@ -16,6 +16,7 @@ class DGGBot(DGGChat):
         *,
         sid: str = None,
         rememberme: str = None,
+        avoid_dupe: bool = False,
         **kwargs,
     ):
         super().__init__(
@@ -26,7 +27,8 @@ class DGGBot(DGGChat):
         self._commands = {}
         bot_config = self.config.get("bot", dict())
         self._send_cooldown = bot_config.get("sendMsgCooldown", 0)
-        self._last_msg: Message = None
+        self._last_msg: tuple[str, float] = None
+        self._avoid_dupe = avoid_dupe
 
     def command(
         self,
@@ -105,13 +107,12 @@ class DGGBot(DGGChat):
         if msg.type in (EventType.MESSAGE, EventType.PRIVMSG) and self.is_command(msg):
             self.on_command(msg)
 
-    def send(self, msg: str, avoid_dupe: bool = False):
-        now = datetime.now()
+    def send(self, msg: str):
         if self._last_msg is not None:
             if self._send_cooldown:
-                if (now - self._last_msg.timestamp).seconds < self._send_cooldown:
+                if time.time() - self._last_msg[1] < self._send_cooldown:
                     return
-            if avoid_dupe and msg == self._last_msg.data:
+            if self._avoid_dupe and msg == self._last_msg[0]:
                 msg += " ."
         super().send(msg)
-        self._last_msg = Message(self, "MSG", data=msg, timestamp=now)
+        self._last_msg = (msg, time.time())
