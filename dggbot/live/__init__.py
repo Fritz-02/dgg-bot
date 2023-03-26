@@ -1,17 +1,26 @@
 import json
-from .message import StreamInfo, YoutubeVideo, YoutubeVod
-from ..wsbase import WSBase
+from typing import Union
+from .message import StreamInfo, YoutubeVideo
 from .._logging import _logger
+from ..wsbase import WSBase
 
 
 class DGGLive(WSBase):
     _CONFIG = {
-        "wss": "wss://live.destiny.gg/ws",
+        "wss": "wss://live.destiny.gg/",
         "wss-origin": "https://www.destiny.gg",
     }
 
-    def __init__(self, auth_token=None, wss: str = None):
-        super().__init__(wss, f"authtoken={auth_token}" if auth_token else None)
+    def __init__(
+        self,
+        auth_token=None,
+        wss: str = None,
+        *,
+        config: Union[str, dict[str, dict]] = None,
+    ):
+        super().__init__(
+            wss, f"authtoken={auth_token}" if auth_token else None, config=config
+        )
         self._live = False
 
     def __repr__(self):
@@ -33,10 +42,14 @@ class DGGLive(WSBase):
         event_type = data["type"]
         event_data = data
         if event_type == "dggApi:streamInfo":
-            event_data = StreamInfo.from_json(data)
-            self.set_live(event_data.live)
+            # event_data = StreamInfo.from_json(data)
+            # self.set_live(event_data.live)
+            self.set_live(event_data["data"]["streams"]["youtube"]["live"])
         elif event_type == "dggApi:youtubeVideos":
             event_data = YoutubeVideo.from_json(data)
+        elif event_type == "dggApi:videos":
+            if (source := event_data["data"]["source"]) == "youtube":
+                event_data = YoutubeVideo.from_json(data)
         elif event_type == "dggApi:youtubeVods":
-            event_data = YoutubeVod.from_json(data)
+            event_data = YoutubeVideo.from_json(data)
         self.on_event(event_type.split(":")[-1].lower(), event_data)

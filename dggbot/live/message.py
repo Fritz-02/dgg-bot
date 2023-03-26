@@ -27,6 +27,8 @@ class YoutubeVideo:
     title: str
     mediumThumbnailUrl: str
     highThumbnailUrl: str
+    streamStartTime: str
+    streamEndTime: str
     url: str
 
     @classmethod
@@ -37,22 +39,9 @@ class YoutubeVideo:
                 vid["title"],
                 vid["mediumThumbnailUrl"],
                 vid["highThumbnailUrl"],
+                vid["streamStartTime"],
+                vid["streamEndTime"],
                 vid["url"],
             )
             for vid in data["data"]
         )
-
-
-@dataclasses.dataclass
-class YoutubeVod:
-    id: str
-    title: str
-    mediumThumbnailUrl: str
-    highThumbnailUrl: str
-    streamStartTime: str
-    streamEndTime: str
-    url: str
-
-    @classmethod
-    def from_json(cls, data: dict) -> tuple["YoutubeVod"]:
-        return tuple(cls(**vod) for vod in data["data"])
