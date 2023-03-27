@@ -8,6 +8,7 @@
   },
   "flairs": "https://cdn.destiny.gg/flairs/flairs.json",
   "bot": {
-    "sendMsgCooldown": 0
+    "sendMsgCooldown": 0,
+    "avoidDupe": false
   }
 }
