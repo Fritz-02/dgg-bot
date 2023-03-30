@@ -26,7 +26,8 @@ class DGGBot(DGGChat):
         self._commands = {}
         bot_config = self.config.get("bot", dict())
         self._send_cooldown = bot_config.get("sendMsgCooldown", 0)
-        self._last_send_time = None
+        self._avoid_dupe = bot_config.get("avoidDupe", False)
+        self._last_msg: tuple[str, float] = None
 
     def command(
         self,
@@ -106,8 +107,11 @@ class DGGBot(DGGChat):
             self.on_command(msg)
 
     def send(self, msg: str):
-        if self._last_send_time is not None and self._send_cooldown:
-            if (time.time() - self._last_send_time) < self._send_cooldown:
+        now = time.time()
+        if self._last_msg is not None:
+            if now - self._last_msg[1] < self._send_cooldown:
                 return
+            if self._avoid_dupe and msg == self._last_msg[0]:
+                msg += " ."
         super().send(msg)
-        self._last_send_time = time.time()
+        self._last_msg = (msg, now)
