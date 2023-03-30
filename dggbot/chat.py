@@ -273,6 +273,7 @@ class DGGChat(WSBase):
     @threaded
     def send(self, msg: str):
         """Send a message to chat."""
+        assert len(msg) <= 512, "512 character limit broken"
         payload = {"data": msg}
         self.ws.send(f"MSG {json.dumps(payload)}")
 
