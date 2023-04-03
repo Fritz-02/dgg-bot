@@ -6,6 +6,7 @@ import requests
 class Flair:
     label: str
     name: str
+    description: str
     hidden: bool
     priority: int
     color: str
