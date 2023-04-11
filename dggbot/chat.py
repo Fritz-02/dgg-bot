@@ -264,7 +264,7 @@ class DGGChat(WSBase):
             user["nick"].lower(): User(
                 user["nick"],
                 self._dggtime_to_dt(user["createdDate"]),
-                user["features"],
+                self._convert_flairs(user["features"]),
             )
             for user in users
         }
