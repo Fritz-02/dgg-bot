@@ -264,11 +264,11 @@ class DGGChat(WSBase):
             user["nick"].lower(): User(
                 user["nick"],
                 self._dggtime_to_dt(user["createdDate"]),
-                user["features"],
+                self._convert_flairs(user),
             )
             for user in users
         }
-        self.on_event("names", connection_count, users)
+        self.on_event("names", connection_count, self._users)
 
     @threaded
     def send(self, msg: str):
