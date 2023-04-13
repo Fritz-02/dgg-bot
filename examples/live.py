@@ -5,7 +5,7 @@ applicable.
 """
 from datetime import datetime
 from dggbot import DGGLive
-from dggbot.live import YoutubeVideo, YoutubeVod, StreamInfo
+from dggbot.live import YoutubeVideo, StreamInfo
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -51,7 +51,7 @@ def on_youtubevideos(videos: tuple[YoutubeVideo]):
 
 
 @live.event()
-def on_youtubevods(vods: tuple[YoutubeVod]):
+def on_youtubevods(vods: tuple[YoutubeVideo]):
     print("Vods:")
     for vod in vods:
         start = datetime.strptime(vod.streamStartTime, "%Y-%m-%dT%H:%M:%S+0000")
