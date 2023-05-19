@@ -1,6 +1,6 @@
 import json
 from typing import Union
-from .message import StreamInfo, YoutubeVideo
+from .message import StreamInfo, YoutubeVideo, YoutubeVod
 from .._logging import _logger
 from ..wsbase import WSBase
 
@@ -41,15 +41,14 @@ class DGGLive(WSBase):
         data = json.loads(message)
         event_type = data["type"]
         event_data = data
-        if event_type == "dggApi:streamInfo":
-            # event_data = StreamInfo.from_json(data)
-            # self.set_live(event_data.live)
-            self.set_live(event_data["data"]["streams"]["youtube"]["live"])
-        elif event_type == "dggApi:youtubeVideos":
-            event_data = YoutubeVideo.from_json(data)
+        if event_type == "dggApi:hosting":
+            event_data = data["data"]
+        elif event_type == "dggApi:streamInfo":
+            event_data = StreamInfo.from_json(data)
+            self.set_live(event_data.is_live())
         elif event_type == "dggApi:videos":
             if (source := event_data["data"]["source"]) == "youtube":
                 event_data = YoutubeVideo.from_json(data)
         elif event_type == "dggApi:youtubeVods":
-            event_data = YoutubeVideo.from_json(data)
+            event_data = YoutubeVod.from_json(data)
         self.on_event(event_type.split(":")[-1].lower(), event_data)
