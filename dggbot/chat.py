@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import json
 import requests
 from typing import Union
+import re
 
 from ._logging import _logger
 from .event import EventType
@@ -51,7 +52,7 @@ class DGGChat(WSBase):
         config: Union[str, dict[str, dict]] = None,
         **kwargs,
     ):
-        self.username = None
+        self.username, self._mention_pattern = None, None
         cookie = (
             f"authtoken={auth_token}"
             if auth_token
@@ -66,6 +67,8 @@ class DGGChat(WSBase):
             self.username = self._get_username_from_token(auth_token)
         elif sid:
             self.username = self._get_username_from_sid(cookie)
+        if self.username:
+            self._mention_pattern = re.compile(rf"\b{self.username}\b", re.IGNORECASE)
         self._flairs = flair_converter(self.config["flairs"])
         self.authenticated = False
         self._users = {}
@@ -253,9 +256,9 @@ class DGGChat(WSBase):
         return self.event("on_mention")
 
     def is_mentioned(self, msg: Union[Message, PrivateMessage]) -> bool:
-        return (
-            False if self.username is None else (self.username in msg.data.casefold())
-        )
+        if self._mention_pattern is None:
+            return False
+        return True if self._mention_pattern.search(msg.data) else False
 
     @threaded
     def on_names(self, connection_count: int, users: list):
