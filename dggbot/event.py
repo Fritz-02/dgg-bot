@@ -6,6 +6,7 @@ class EventType:
     BROADCAST = "BROADCAST"
     ERROR = "ERR"
     JOIN = "JOIN"
+    ME = "ME"
     MESSAGE = "MSG"
     MUTE = "MUTE"
     NAMES = "NAMES"
