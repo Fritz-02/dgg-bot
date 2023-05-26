@@ -8,7 +8,7 @@ DGG-bot
    :target: https://pypi.python.org/pypi/dgg-bot
    :alt: PyPI supported Python versions
 
-A library for making a bot in Destiny.gg chat.
+A library for connecting to and making a bot in Destiny.gg chat.
 
 Installing
 ----------

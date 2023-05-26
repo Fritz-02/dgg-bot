@@ -7,12 +7,12 @@ name = "dgg-bot"
 authors = [
     { name="Fritz-02"},
 ]
-description="A library for making a bot in Destiny.gg chat."
+description="A library for connecting to and making a bot in Destiny.gg chat."
 readme = "README.rst"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.9",
