@@ -5,7 +5,7 @@ from typing import Union
 
 from ._logging import _logger
 from .event import EventType
-from .flairs import Flair, flair_converter
+from .flairs import Flair, flair_converter, convert_flairs
 from .funcs import threaded
 from .message import (
     Message,
@@ -51,7 +51,6 @@ class DGGChat(WSBase):
         config: Union[str, dict[str, dict]] = None,
         **kwargs,
     ):
-        self.username = None
         cookie = (
             f"authtoken={auth_token}"
             if auth_token
@@ -62,13 +61,15 @@ class DGGChat(WSBase):
             )
         )
         super().__init__(wss, cookie, config=config)
-        if auth_token:
-            self.username = self._get_username_from_token(auth_token)
-        elif sid:
-            self.username = self._get_username_from_sid(cookie)
+        self.user = None
         self._flairs = flair_converter(self.config["flairs"])
         self.authenticated = False
         self._users = {}
+
+    @property
+    def username(self) -> str:
+        if self.user is not None:
+            return self.user.name
 
     def __repr__(self):
         return (
@@ -77,19 +78,7 @@ class DGGChat(WSBase):
             else f"{self.__class__.__name__}()"
         )
 
-    def _dggtime_to_dt(self, timestamp: str) -> datetime:
-        timestamp = timestamp.replace("+0000", "Z")
-        return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
-
-    def _dggepoch_to_dt(self, epoch: int) -> datetime:
-        return datetime.fromtimestamp(
-            epoch // 1000, tz=timezone.utc
-        )  # dgg sends milliseconds
-
-    def _convert_flairs(self, data: dict) -> Union[list[Flair], None]:
-        if "features" in data:
-            return [self._flairs[flair] for flair in data["features"]]
-
+    # The following two functions are probably pointless now with the ME event, but I'll leave them in for now. - Fritz
     def _get_username_from_token(self, auth_token: str) -> Union[str, None]:
         r = requests.get(
             f"{self.config['baseurl']}{self.config['endpoints']['userinfo']}?token={auth_token}"
@@ -144,26 +133,21 @@ class DGGChat(WSBase):
     def _on_message(self, ws, message: str):
         event_type, data = message.split(maxsplit=1)
         data = json.loads(data)
-        if event_type == EventType.MUTE:
-            msg = MuteMessage(
-                self,
-                event_type,
-                data["nick"],
-                self._dggtime_to_dt(data["createdDate"]),
-                self._convert_flairs(data),
-                self._dggepoch_to_dt(data["timestamp"]),
-                data["data"],
-                data["duration"],
-            )
+        if event_type == EventType.ME:
+            _logger.debug(f"{event_type} {data}")
+            if data is not None:
+                self.user = User(
+                    data["ID"],
+                    data["nick"],
+                    convert_flairs(self._flairs, data.get("features")),
+                )
+            else:
+                self.user = None
+            return
+        elif event_type == EventType.MUTE:
+            msg = MuteMessage(self, event_type, data)
         elif event_type == EventType.PRIVMSG:
-            msg = PrivateMessage(
-                self,
-                event_type,
-                data["nick"],
-                timestamp=self._dggepoch_to_dt(data["timestamp"]),
-                data=data["data"],
-                message_id=data["messageid"],
-            )
+            msg = PrivateMessage(self, event_type, data)
         elif event_type == EventType.PRIVMSGSENT:
             return
         elif event_type == EventType.ERROR:
@@ -177,57 +161,18 @@ class DGGChat(WSBase):
             self.on_names(data["connectioncount"], data["users"])
             return
         elif event_type == EventType.PIN:
-            msg = PinnedMessage(
-                self,
-                event_type,
-                data["nick"],
-                self._dggtime_to_dt(data["createdDate"]),
-                self._convert_flairs(data),
-                self._dggepoch_to_dt(data["timestamp"]),
-                data.get("data"),
-                data["uuid"],
-            )
+            msg = PinnedMessage(self, event_type, data)
         elif event_type in (EventType.POLLSTART, EventType.POLLSTOP):
-            msg = PollMessage(
-                self,
-                event_type,
-                data["nick"],
-                canvote=data["canvote"],
-                myvote=data["myvote"],
-                weighted=data["weighted"],
-                start=self._dggtime_to_dt(data["start"]),
-                now=self._dggtime_to_dt(data["now"]),
-                # Time comes in milliseconds
-                time=data["time"] // 1000,
-                question=data["question"],
-                options=data["options"],
-                totals=data["totals"],
-                totalvotes=data["totalvotes"],
-            )
+            msg = PollMessage(self, event_type, data)
         elif event_type == EventType.VOTECAST:
-            msg = VoteMessage(
-                self,
-                event_type,
-                data["nick"],
-                vote=data["vote"],
-            )
+            msg = VoteMessage(self, event_type, data)
         else:
-            msg = Message(
-                self,
-                event_type,
-                data.get("nick"),
-                self._dggtime_to_dt(data["createdDate"])
-                if "createdDate" in data
-                else None,
-                self._convert_flairs(data),
-                self._dggepoch_to_dt(data["timestamp"]),
-                data.get("data"),
-            )
-
+            msg = Message(self, event_type, data)
         if event_type == EventType.QUIT:
             self._users.pop(msg.nick_lower, None)
         elif event_type == EventType.JOIN:
-            self._users[msg.nick_lower] = User(msg.nick, msg.createdDate, msg.features)
+            self._users[msg.nick_lower] = msg.user
+        print(msg)
 
         self.on_event(event_type.lower(), msg)
         if event_type in (EventType.MESSAGE, EventType.PRIVMSG) and self.is_mentioned(
@@ -262,9 +207,9 @@ class DGGChat(WSBase):
         """Do stuff when the NAMES message is received upon connecting to chat."""
         self._users = {
             user["nick"].lower(): User(
-                user["nick"],
-                self._dggtime_to_dt(user["createdDate"]),
-                self._convert_flairs(user),
+                user.get("ID"),
+                user.get("nick"),
+                convert_flairs(self._flairs, user.get("features")),
             )
             for user in users
         }
