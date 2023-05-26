@@ -1,5 +1,6 @@
 import dataclasses
 import requests
+from typing import Union
 
 
 @dataclasses.dataclass
@@ -22,3 +23,9 @@ def flair_converter(endpoint: str) -> dict:
     r = requests.get(endpoint)
     converter = {item["name"]: Flair(**item) for item in r.json()}
     return converter
+
+
+def convert_flairs(flair_dict: dict, features: list = None) -> Union[list[Flair], None]:
+    """Converts a list of features into their corresponding Flairs, using a dict created from flair_converter."""
+    if features:
+        return [flair_dict[flair] for flair in features]
