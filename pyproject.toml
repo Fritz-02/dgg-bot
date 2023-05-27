@@ -27,7 +27,7 @@ dynamic = ["dependencies", "version"]
 "Bug Tracker" = "https://github.com/Fritz-02/dgg-bot/issues"
 
 [project.optional-dependencies]
-dev = ["black", "flake8"]
+dev = ["black", "flake8", "python-dotenv"]
 
 [tool.black]
 line-length = 88
