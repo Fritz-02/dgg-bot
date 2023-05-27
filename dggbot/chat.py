@@ -137,7 +137,7 @@ class DGGChat(WSBase):
             _logger.debug(f"{event_type} {data}")
             if data is not None:
                 self.user = User(
-                    data["ID"],
+                    data["id"],
                     data["nick"],
                     convert_flairs(self._flairs, data.get("features")),
                 )
@@ -172,7 +172,6 @@ class DGGChat(WSBase):
             self._users.pop(msg.nick_lower, None)
         elif event_type == EventType.JOIN:
             self._users[msg.nick_lower] = msg.user
-        print(msg)
 
         self.on_event(event_type.lower(), msg)
         if event_type in (EventType.MESSAGE, EventType.PRIVMSG) and self.is_mentioned(
@@ -207,13 +206,18 @@ class DGGChat(WSBase):
         """Do stuff when the NAMES message is received upon connecting to chat."""
         self._users = {
             user["nick"].lower(): User(
-                user.get("ID"),
+                user.get("id"),
                 user.get("nick"),
                 convert_flairs(self._flairs, user.get("features")),
             )
             for user in users
         }
         self.on_event("names", connection_count, self._users)
+
+    @threaded
+    def send_raw(self, event_type: str, payload: dict):
+        """Send the specified event_type and payload."""
+        self.ws.send(f"{event_type} {json.dumps(payload)}")
 
     @threaded
     def send(self, msg: str):
