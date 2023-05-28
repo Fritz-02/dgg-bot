@@ -12,8 +12,12 @@ if TYPE_CHECKING:
 
 
 def convert_datetime(dt_string: str) -> datetime:
-    # DGG returns a string with 9 microsecond digits, while datetime only goes up to 6. So the last 3 are cut off.
-    dt = datetime.strptime(f"{dt_string[:-4]}Z", "%Y-%m-%dT%H:%M:%S.%fZ")
+    if (n := len(dt_string)) == 20:  # seconds given
+        dt = datetime.strptime(dt_string, "%Y-%m-%dT%H:%M:%SZ")
+    elif n <= 27:  # microseconds given
+        dt = datetime.strptime(dt_string, "%Y-%m-%dT%H:%M:%S.%fZ")
+    else:  # if more than 6 digits for microseconds is given, do not include them. Datetime only allows up to 6
+        dt = datetime.strptime(dt_string[:26] + "Z", "%Y-%m-%dT%H:%M:%S.%fZ")
     return dt
 
 
@@ -33,8 +37,9 @@ class _MessageBase:
         return self._data.get(key)
 
     @property
-    def nick_lower(self) -> str:
-        return self.nick.lower()
+    def nick_lower(self) -> Union[str, None]:
+        if self.nick:
+            return self.nick.lower()
 
     def __post_init__(self):
         _logger.debug(self)
@@ -51,16 +56,13 @@ class Message(_MessageBase):
         super().__init__(chat, type_, data)
         self.id: int = data.get("ID")
         self.features: list[Flair] = convert_flairs(chat._flairs, data.get("features"))
-        self.last_message: str = data.get("Lastmessage")
-        self.last_message_time: datetime = convert_datetime(data.get("Lastmessagetime"))
-        self.delay_scale: int = data.get("Delayscale")
-        self.connections: int = data.get("Connections")
+        self.created_date = convert_datetime(data.get("createdDate"))
         self.timestamp = convert_timestamp(data.get("timestamp"))
         self.data: str = data.get("data")
 
     @property
     def user(self) -> User:
-        return User(self.id, self.nick, self.features)
+        return User(self.id, self.nick, self.created_date, self.features)
 
     def reply(self, content):
         self.chat.send(content)
@@ -91,6 +93,47 @@ class PinnedMessage(Message):
     def __init__(self, chat: DGGChat, type_: str, data: dict):
         super().__init__(chat, type_, data)
         self.uuid: str = data.get("uuid")
+
+
+class BroadcastMessage(_MessageBase):
+    def __init__(self, chat: DGGChat, type_: str, data: dict):
+        super().__init__(chat, type_, data)
+        self.data: str = data.get("data")
+
+
+class _SubMessageBase(_MessageBase):
+    def __init__(self, chat: DGGChat, type_: str, data: dict):
+        super().__init__(chat, type_, data)
+        self.timestamp = convert_timestamp(data.get("timestamp"))
+        self.data: str = data.get("data")
+        self.tier: int = data.get("tier")
+        self.tier_label: str = data.get("tierLabel")
+
+
+class SubscriptionMessage(_SubMessageBase):
+    def __init__(self, chat: DGGChat, type_: str, data: dict):
+        super().__init__(chat, type_, data)
+        self.streak: int = data.get("streak")
+
+
+class MassGiftMessage(_SubMessageBase):
+    def __init__(self, chat: DGGChat, type_: str, data: dict):
+        super().__init__(chat, type_, data)
+        self.quantity: int = data.get("quantity")
+
+
+class GiftSubMessage(_SubMessageBase):
+    def __init__(self, chat: DGGChat, type_: str, data: dict):
+        super().__init__(chat, type_, data)
+        self.giftee: int = data.get("giftee")
+
+
+class DonationMessage(_MessageBase):
+    def __init__(self, chat: DGGChat, type_: str, data: dict):
+        super().__init__(chat, type_, data)
+        self.timestamp = convert_timestamp(data.get("timestamp"))
+        self.data: str = data.get("data")
+        self.amount: int = data.get("amount")  # in US cents
 
 
 class PollMessage(_MessageBase):
