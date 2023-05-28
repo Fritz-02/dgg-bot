@@ -168,9 +168,11 @@ class DGGChat(WSBase):
             msg = BroadcastMessage(self, event_type, data)
         elif event_type == EventType.ERROR:
             if (desc := data["description"]) in self._err_dict:
+                self.on_event("error", self._err_dict[desc])
                 raise self._err_dict[desc]
             else:
                 _logger.error(event_type, data)
+                self.on_event("error", data)
                 raise Exception(desc)
         elif event_type == EventType.NAMES:
             _logger.debug(f"{event_type} {data}")
@@ -213,9 +215,7 @@ class DGGChat(WSBase):
         return self.event("on_mention")
 
     def is_mentioned(self, msg: Union[Message, PrivateMessage]) -> bool:
-        return (
-            False if self.username is None else (self.username in msg.data.casefold())
-        )
+        return False if self.user is None else self.user.is_mentioned(msg)
 
     @threaded
     def on_names(self, connection_count: int, users: list):
