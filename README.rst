@@ -1,6 +1,9 @@
 DGG-bot
 =======
 
+.. image:: https://img.shields.io/pypi/l/dgg-bot.svg
+   :target: https://pypi.python.org/pypi/dgg-bot
+   :alt: PyPI license info
 .. image:: https://img.shields.io/pypi/v/dgg-bot.svg
    :target: https://pypi.python.org/pypi/dgg-bot
    :alt: PyPI version info
