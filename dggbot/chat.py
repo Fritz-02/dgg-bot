@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 import json
 import requests
 from typing import Union
@@ -14,6 +13,12 @@ from .message import (
     PollMessage,
     PrivateMessage,
     VoteMessage,
+    SubscriptionMessage,
+    MassGiftMessage,
+    GiftSubMessage,
+    DonationMessage,
+    BroadcastMessage,
+    convert_datetime,
 )
 from .user import User
 from .wsbase import WSBase
@@ -139,6 +144,7 @@ class DGGChat(WSBase):
                 self.user = User(
                     data["id"],
                     data["nick"],
+                    convert_datetime(data.get("createdDate")),
                     convert_flairs(self._flairs, data.get("features")),
                 )
             else:
@@ -150,6 +156,16 @@ class DGGChat(WSBase):
             msg = PrivateMessage(self, event_type, data)
         elif event_type == EventType.PRIVMSGSENT:
             return
+        elif event_type == EventType.SUBSCRIPTION:
+            msg = SubscriptionMessage(self, event_type, data)
+        elif event_type == EventType.MASSGIFT:
+            msg = MassGiftMessage(self, event_type, data)
+        elif event_type == EventType.GIFTSUB:
+            msg = GiftSubMessage(self, event_type, data)
+        elif event_type == EventType.DONATION:
+            msg = DonationMessage(self, event_type, data)
+        elif event_type == EventType.BROADCAST:
+            msg = BroadcastMessage(self, event_type, data)
         elif event_type == EventType.ERROR:
             if (desc := data["description"]) in self._err_dict:
                 raise self._err_dict[desc]
@@ -208,6 +224,7 @@ class DGGChat(WSBase):
             user["nick"].lower(): User(
                 user.get("id"),
                 user.get("nick"),
+                convert_datetime(user.get("createdDate")),
                 convert_flairs(self._flairs, user.get("features")),
             )
             for user in users
