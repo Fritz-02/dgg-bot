@@ -150,6 +150,9 @@ class PollMessage(_MessageBase):
         self.totals: list[int] = data.get("totals")
         self.total_votes: int = data.get("totalvotes")
 
+    def vote(self, option: int):
+        self.chat.cast_vote(option)
+
 
 class VoteMessage(_MessageBase):
     def __init__(self, chat: DGGChat, type_: str, data: dict):
