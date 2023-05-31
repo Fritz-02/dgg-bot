@@ -1,6 +1,5 @@
 from dggbot import DGGBot
-from dggbot.message import PollMessage, Message
-
+from dggbot.message import Message, PollMessage
 
 bot = DGGBot("auth_token")
 

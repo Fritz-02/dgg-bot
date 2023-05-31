@@ -2,6 +2,7 @@ import inspect
 import itertools
 import time
 from typing import Callable, Union
+
 from .chat import DGGChat, EventType
 from .message import Message, PrivateMessage
 

@@ -1,6 +1,4 @@
 from dggbot import DGGChat, Message
-import time
-
 
 chat = DGGChat()  # no auth_token is needed when you only need to read chat
 

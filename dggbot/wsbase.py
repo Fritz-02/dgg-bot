@@ -1,11 +1,12 @@
-from abc import abstractmethod, ABC
 import json
 import time
+from abc import ABC, abstractmethod
 from typing import Callable, Union
+
 import websocket
 
-from .funcs import threaded
 from ._logging import _logger
+from .funcs import threaded
 
 
 class WSBase(ABC):

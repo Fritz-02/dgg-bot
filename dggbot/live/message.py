@@ -1,5 +1,4 @@
 import dataclasses
-from typing import Union
 
 
 @dataclasses.dataclass
@@ -39,13 +38,21 @@ class StreamInfo:
 
     def get_livestreams(self) -> tuple[Stream]:
         """Returns streams that are currently live."""
-        streams = tuple(s for s in (self.twitch, self.youtube, self.facebook, self.rumble, self.kick) if isinstance(s, Stream) and s.live)
+        streams = tuple(
+            s
+            for s in (self.twitch, self.youtube, self.facebook, self.rumble, self.kick)
+            if isinstance(s, Stream) and s.live
+        )
         return streams
 
     @property
     def viewers(self) -> int:
         """Returns the sum of viewers from each livestream."""
-        return sum(s.viewers for s in (self.twitch, self.youtube, self.facebook, self.rumble, self.kick) if isinstance(s, Stream) and s.live)
+        return sum(
+            s.viewers
+            for s in (self.twitch, self.youtube, self.facebook, self.rumble, self.kick)
+            if isinstance(s, Stream) and s.live
+        )
 
     @classmethod
     def from_json(cls, data: dict) -> "StreamInfo":

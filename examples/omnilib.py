@@ -1,6 +1,5 @@
 from dggbot import DGGChat
 
-
 cfg = {
     "wss": "wss://chat.omniliberal.dev/ws",
     "wss-origin": "https://www.omniliberal.dev",

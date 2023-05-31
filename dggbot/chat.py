@@ -1,27 +1,9 @@
 import json
-import requests
 from typing import Union
 
+import requests
+
 from ._logging import _logger
-from .event import EventType
-from .flairs import Flair, flair_converter, convert_flairs
-from .funcs import threaded
-from .message import (
-    Message,
-    MuteMessage,
-    PinnedMessage,
-    PollMessage,
-    PrivateMessage,
-    VoteMessage,
-    SubscriptionMessage,
-    MassGiftMessage,
-    GiftSubMessage,
-    DonationMessage,
-    BroadcastMessage,
-    convert_datetime,
-)
-from .user import User
-from .wsbase import WSBase
 from .errors import (
     AccountTooYoung,
     Banned,
@@ -35,6 +17,25 @@ from .errors import (
     Throttled,
     TooManyConnections,
 )
+from .event import EventType
+from .flairs import Flair, convert_flairs, flair_converter
+from .funcs import threaded
+from .message import (
+    BroadcastMessage,
+    DonationMessage,
+    GiftSubMessage,
+    MassGiftMessage,
+    Message,
+    MuteMessage,
+    PinnedMessage,
+    PollMessage,
+    PrivateMessage,
+    SubscriptionMessage,
+    VoteMessage,
+    convert_datetime,
+)
+from .user import User
+from .wsbase import WSBase
 
 
 class DGGChat(WSBase):
@@ -200,7 +201,6 @@ class DGGChat(WSBase):
 
     def _post_message(self, msg):
         """Do stuff after _on_message"""
-        pass
 
     def _on_open(self, ws):
         _logger.info(

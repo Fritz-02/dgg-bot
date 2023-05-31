@@ -2,8 +2,9 @@
 Example on how to implement a cooldown for non-commands, like mentions.
 Inspiration from https://github.com/tenacious210/dggpt
 """
-from dggbot import DGGBot
 import time
+
+from dggbot import DGGBot
 
 bot = DGGBot("AUTH_TOKEN", owner="OWNER")
 cooldown = 60  # seconds

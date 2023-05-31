@@ -2,8 +2,9 @@
 Colorful chat in console, with messages, greentext, subscriber colors, flair names, broadcast messages,
 and when chatters join and left chat.
 """
-from dggbot import DGGChat, Message
 import itertools
+
+from dggbot import DGGChat, Message
 
 # Option(s) for what messages appear or not
 JOIN_AND_LEFT = True

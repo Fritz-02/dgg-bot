@@ -1,6 +1,6 @@
-from dggbot import DGGBot
-import time
 from typing import Optional
+
+from dggbot import DGGBot
 
 bot = DGGBot(
     owner="Owner",

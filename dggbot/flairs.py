@@ -1,6 +1,7 @@
 import dataclasses
-import requests
 from typing import Union
+
+import requests
 
 
 @dataclasses.dataclass

@@ -1,8 +1,9 @@
 import json
 from typing import Union
-from .message import StreamInfo, YoutubeVideo, YoutubeVod
+
 from .._logging import _logger
 from ..wsbase import WSBase
+from .message import StreamInfo, YoutubeVideo, YoutubeVod
 
 
 class DGGLive(WSBase):

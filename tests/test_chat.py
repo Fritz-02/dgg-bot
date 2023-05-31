@@ -9,7 +9,6 @@ import time
 
 from dggbot import DGGChat
 
-
 checks = {"connection": False}
 
 

@@ -1,5 +1,4 @@
 from dggbot import DGGBot
-import time
 
 bot = DGGBot("AUTH_TOKEN", owner="Owner")
 

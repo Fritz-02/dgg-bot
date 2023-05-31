@@ -1,6 +1,7 @@
-from dggbot import DGGBot, Message, PrivateMessage, MuteMessage
-from typing import Union
 import time
+from typing import Union
+
+from dggbot import DGGBot, Message, MuteMessage, PrivateMessage
 
 bot = DGGBot("AUTH_TOKEN", owner="Owner")
 

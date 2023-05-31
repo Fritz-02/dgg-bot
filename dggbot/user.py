@@ -1,8 +1,9 @@
 from __future__ import annotations
+
 import dataclasses
+import re
 from datetime import datetime
 from functools import cache
-import re
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

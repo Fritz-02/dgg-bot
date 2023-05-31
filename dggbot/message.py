@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Union
+
 from ._logging import _logger
 from .flairs import Flair, convert_flairs
 from .user import User
-
-from typing import Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .chat import DGGChat

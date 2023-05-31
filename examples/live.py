@@ -3,10 +3,11 @@ Example of how to use DGGLive, which gives stream info when stream is live, and 
 Prints the same text as the !live command message in chat, and youtube video and vod names, url, and stream length if
 applicable.
 """
-from datetime import datetime
-from dggbot import DGGLive
-from dggbot.live import YoutubeVideo, StreamInfo
 import logging
+from datetime import datetime
+
+from dggbot import DGGLive
+from dggbot.live import StreamInfo, YoutubeVideo
 
 logging.basicConfig(level=logging.INFO)
 live = DGGLive()
@@ -28,7 +29,9 @@ def on_streaminfo(streaminfo: StreamInfo):
             f"Viewers: {streaminfo.viewers}. Stream live as of {sec_to_hm(started_ago.seconds)} ago"
         )
     else:
-        ended_at = datetime.strptime(streaminfo.youtube.ended_at, "%Y-%m-%dT%H:%M:%S+0000")
+        ended_at = datetime.strptime(
+            streaminfo.youtube.ended_at, "%Y-%m-%dT%H:%M:%S+0000"
+        )
         last_online = datetime.utcnow() - ended_at
         s = ["Stream was last online"]
         if last_online.days:
@@ -59,7 +62,9 @@ def on_youtubevods(vods: tuple):
         start = datetime.strptime(vod.streamStartTime, "%Y-%m-%dT%H:%M:%S+0000")
         end = datetime.strptime(vod.streamEndTime, "%Y-%m-%dT%H:%M:%S+0000")
         duration = end - start
-        s.append(f"\t{vod.title} ({vod.url}). Streamed for {sec_to_hm(duration.seconds)}")
+        s.append(
+            f"\t{vod.title} ({vod.url}). Streamed for {sec_to_hm(duration.seconds)}"
+        )
     print("\n".join(s))
 
 
