@@ -18,6 +18,9 @@ class Flair:
     def __repr__(self):
         return f"Flair<{self.label}>"
 
+    def __hash__(self):
+        return hash(self.name)
+
 
 def flair_converter(endpoint: str) -> dict:
     """Returns a dict to convert flair names (e.g. flair17) to a Flair object."""
