@@ -83,7 +83,7 @@ class WSBase(ABC):
         self._connected = True
 
     def _on_error(self, ws, error):
-        _logger.error(error)
+        _logger.error(f"{type(error).__name__}. Args: {error.args}")
 
     def _on_close(self, ws, *_):
         _logger.debug(f"Connection closed.")

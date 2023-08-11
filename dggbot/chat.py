@@ -172,7 +172,7 @@ class DGGChat(WSBase):
                 self.on_event("error", self._err_dict[desc])
                 raise self._err_dict[desc]
             else:
-                _logger.error(event_type, data)
+                _logger.error(f"Unknown error from message: {message}")
                 self.on_event("error", data)
                 raise Exception(desc)
         elif event_type == EventType.NAMES:
