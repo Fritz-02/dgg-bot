@@ -137,10 +137,10 @@ class DGGChat(WSBase):
     }
 
     def _on_message(self, ws, message: str):
+        _logger.debug(f"_on_message: {message}")
         event_type, data = message.split(maxsplit=1)
         data = json.loads(data)
         if event_type == EventType.ME:
-            _logger.debug(f"{event_type} {data}")
             if data is not None:
                 self.user = User(
                     data["id"],
@@ -176,7 +176,6 @@ class DGGChat(WSBase):
                 self.on_event("error", data)
                 raise Exception(desc)
         elif event_type == EventType.NAMES:
-            _logger.debug(f"{event_type} {data}")
             self.on_names(data["connectioncount"], data["users"])
             return
         elif event_type == EventType.PIN:
