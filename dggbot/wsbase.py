@@ -70,8 +70,13 @@ class WSBase(ABC):
     def run_forever(self, origin: str = None, sleep: int = 2):
         """Runs the client forever by automatically reconnecting the websocket."""
         while True:
-            self.run(origin=origin or self.config["wss-origin"])
-            time.sleep(sleep)
+            try:
+                self.run(origin=origin or self.config["wss-origin"])
+            except websocket.WebSocketException as err:
+                _logger.error(
+                    f"WebSocketException: {err}. Retrying in {sleep} seconds."
+                )
+                time.sleep(sleep)
 
     # Websocket methods
     @abstractmethod
