@@ -74,9 +74,10 @@ class WSBase(ABC):
                 self.run(origin=origin or self.config["wss-origin"])
             except websocket.WebSocketException as err:
                 _logger.error(
-                    f"WebSocketException: {err}. Retrying in {sleep} seconds."
+                    f"WebSocketException: {err}. Retrying connection to {self.wss} in {sleep} seconds."
                 )
-                time.sleep(sleep)
+                self.ws.close()
+            time.sleep(sleep)
 
     # Websocket methods
     @abstractmethod
