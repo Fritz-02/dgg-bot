@@ -24,6 +24,7 @@ class EventType:
     SUBSCRIPTION = "SUBSCRIPTION"
     UNBAN = "UNBAN"
     UNMUTE = "UNMUTE"
+    UPDATEUSER = "UPDATEUSER"
     VOTECAST = "VOTECAST"
 
     @classmethod
