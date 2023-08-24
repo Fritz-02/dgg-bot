@@ -11,7 +11,9 @@ if TYPE_CHECKING:
     from .chat import DGGChat
 
 
-def convert_datetime(dt_string: str) -> datetime:
+def convert_datetime(dt_string: Union[str, None]) -> Union[datetime, None]:
+    if dt_string is None:
+        return
     if (n := len(dt_string)) == 20:  # seconds given
         dt = datetime.strptime(dt_string, "%Y-%m-%dT%H:%M:%SZ")
     elif n <= 27:  # microseconds given
@@ -21,8 +23,10 @@ def convert_datetime(dt_string: str) -> datetime:
     return dt
 
 
-def convert_timestamp(ts: int) -> datetime:
+def convert_timestamp(ts: Union[int, None]) -> Union[datetime, None]:
     """ts: timestamp (in microseconds)"""
+    if ts is None:
+        return
     return datetime.fromtimestamp(ts // 1000, tz=timezone.utc)
 
 
