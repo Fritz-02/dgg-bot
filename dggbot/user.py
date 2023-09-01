@@ -3,7 +3,6 @@ from __future__ import annotations
 import dataclasses
 import re
 from datetime import datetime
-from functools import cache
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -17,7 +16,7 @@ class User:
     created_date: datetime
     features: list = dataclasses.field(default_factory=list)
 
-    @cache
+    # @cache
     def _name_regex(self) -> re.Pattern:
         return re.compile(rf"\b{self.name}\b", re.IGNORECASE)
 
