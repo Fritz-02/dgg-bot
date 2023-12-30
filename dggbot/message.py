@@ -27,7 +27,7 @@ def convert_timestamp(ts: Union[int, None]) -> Union[datetime, None]:
     """ts: timestamp (in microseconds)"""
     if ts is None:
         return
-    return datetime.fromtimestamp(ts // 1000, tz=timezone.utc)
+    return datetime.fromtimestamp(ts / 1000, tz=timezone.utc)
 
 
 class _MessageBase:
