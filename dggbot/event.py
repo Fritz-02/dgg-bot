@@ -4,6 +4,7 @@ from functools import cache
 class EventType:
     BAN = "BAN"
     BROADCAST = "BROADCAST"
+    DEATH = "DEATH"
     DONATION = "DONATION"
     ERROR = "ERR"
     GIFTSUB = "GIFTSUB"

@@ -35,6 +35,7 @@ class _MessageBase:
         self.chat = chat
         self.type = type_
         self.nick: str = data.get("nick")
+        self.watching: Union[None, dict] = data.get("watching")
         self._data = data
 
     def get(self, key: str):
@@ -58,7 +59,7 @@ class _MessageBase:
 class Message(_MessageBase):
     def __init__(self, chat: DGGChat, type_: str, data: dict):
         super().__init__(chat, type_, data)
-        self.id: int = data.get("ID")
+        self.id: int = data.get("id")
         self.features: list[Flair] = convert_flairs(chat._flairs, data.get("features"))
         self.created_date = convert_datetime(data.get("createdDate"))
         self.timestamp = convert_timestamp(data.get("timestamp"))

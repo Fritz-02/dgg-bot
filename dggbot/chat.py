@@ -151,7 +151,7 @@ class DGGChat(WSBase):
             else:
                 self.user = None
             return
-        elif event_type == EventType.MUTE:
+        elif event_type in (EventType.MUTE, EventType.DEATH):
             msg = MuteMessage(self, event_type, data)
         elif event_type == EventType.PRIVMSG:
             msg = PrivateMessage(self, event_type, data)
