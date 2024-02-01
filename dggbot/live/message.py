@@ -14,6 +14,7 @@ class Stream:
     id: str
     platform: str
     type: str
+    chat_url: str
 
     @classmethod
     def from_json(cls, data: dict) -> "Stream":
