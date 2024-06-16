@@ -3,7 +3,7 @@ from typing import Union
 
 from .._logging import _logger
 from ..wsbase import WSBase
-from .message import StreamInfo, YoutubeVideo, YoutubeVod
+from .message import Embed, Stream, StreamInfo, YoutubeVideo, YoutubeVod
 
 
 class DGGLive(WSBase):
@@ -52,4 +52,6 @@ class DGGLive(WSBase):
                 event_data = YoutubeVideo.from_json(data)
         elif event_type == "dggApi:youtubeVods":
             event_data = YoutubeVod.from_json(data)
+        elif event_type == "dggApi:embeds":
+            event_data = [Embed.from_json(e) for e in data["data"]]
         self.on_event(event_type.split(":")[-1].lower(), event_data)

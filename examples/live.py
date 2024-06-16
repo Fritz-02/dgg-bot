@@ -7,7 +7,7 @@ import logging
 from datetime import datetime
 
 from dggbot import DGGLive
-from dggbot.live import StreamInfo, YoutubeVideo
+from dggbot.live import Embed, StreamInfo, YoutubeVideo
 
 logging.basicConfig(level=logging.INFO)
 live = DGGLive()
@@ -66,6 +66,12 @@ def on_youtubevods(vods: tuple):
             f"\t{vod.title} ({vod.url}). Streamed for {sec_to_hm(duration.seconds)}"
         )
     print("\n".join(s))
+
+
+@live.event()
+def on_embeds(embeds: list[Embed]):
+    for embed in embeds:
+        print(f"#{embed.platform}/{embed.id} - {embed.count} viewers")
 
 
 if __name__ == "__main__":
