@@ -2,6 +2,17 @@ import dataclasses
 
 
 @dataclasses.dataclass
+class Embed:
+    platform: str
+    id: str
+    count: int
+
+    @classmethod
+    def from_json(cls, data: dict) -> "Embed":
+        return cls(**data)
+
+
+@dataclasses.dataclass
 class Stream:
     live: bool
     game: str
@@ -76,6 +87,8 @@ class YoutubeVideo:
     streamEndTime: str
     url: str
     thumbnailHref: str
+    publishDate: str
+    embedUrl: str
 
     @classmethod
     def from_json(cls, data: dict) -> tuple["YoutubeVideo"]:
@@ -91,6 +104,7 @@ class YoutubeVod:
     streamStartTime: str
     streamEndTime: str
     url: str
+    embedUrl: str
 
     @classmethod
     def from_json(cls, data: dict) -> tuple["YoutubeVod"]:
