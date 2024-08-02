@@ -72,17 +72,25 @@ class WSBase(ABC):
         while True:
             try:
                 self.run(origin=origin or self.config["wss-origin"])
+            except websocket._exceptions.WebSocketConnectionClosedException as err:
+                _logger.info(
+                    f"WebSocketConnectionClosedException in run_forever: {err}. Reconnecting in {sleep} seconds."
+                )
             except websocket.WebSocketException as err:
+                _logger.info(
+                    f"WebSocketException in run_forever: {err}. Reconnecting in {sleep} seconds."
+                )
+                self.ws.close()
+            except Exception as err:
                 _logger.error(
-                    f"WebSocketException: {err}. Retrying connection to {self.wss} in {sleep} seconds."
+                    f"Unhandled exception in run_forever: {err}. Reconnecting in {sleep} seconds."
                 )
                 self.ws.close()
             time.sleep(sleep)
 
     # Websocket methods
     @abstractmethod
-    def _on_message(self, ws, message: str):
-        ...
+    def _on_message(self, ws, message: str): ...
 
     def _on_open(self, ws):
         _logger.info(f"Connecting to {self.wss}.")
