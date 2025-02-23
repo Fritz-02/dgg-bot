@@ -13,6 +13,10 @@ DGG-bot
 
 A library for connecting to and making a bot in Destiny.gg chat.
 
+**KNOWN ISSUE**: There is an problem with at least Python 3.13 and 
+`websocket-client v1.8.0 <https://pypi.org/project/websocket-client/>`_
+and Cloudflare that results in being unable to connect. Please use an earlier version of Python in the meantime.
+
 Installing
 ----------
 
